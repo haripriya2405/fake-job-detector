@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JobScamScore Threat Scanner</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="extension-container">
+    <!-- Header -->
+    <header class="header">
+      <div class="brand">
+        <div class="logo-shield">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <span class="brand-title">JobScamScore</span>
+          <span class="brand-subtitle">8-Layer Forensic Shield</span>
+        </div>
+      </div>
+      <div class="status-indicator live">LIVE</div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+      <!-- Page Context -->
+      <div id="page-context" class="page-context">
+        <div class="context-label">DETECTED JOB LISTING</div>
+        <div id="job-title-display" class="job-title-display">Extracting active page...</div>
+        <div id="company-name-display" class="company-name-display">Scanning DOM elements...</div>
+      </div>
+
+      <!-- Action Button -->
+      <button type="button" id="scan-btn" class="scan-btn">
+        <span class="btn-icon">⚡</span>
+        <span id="scan-btn-text">Scan This Job Listing</span>
+      </button>
+
+      <!-- Scan Progress / Results View -->
+      <div id="results-view" class="results-view hidden">
+        <div class="score-card">
+          <div class="score-left">
+            <div class="score-label">RISK SCORE</div>
+            <div id="risk-score" class="risk-score">--</div>
+          </div>
+          <div class="score-right">
+            <div id="verdict-badge" class="verdict-badge">ANALYZING</div>
+            <div id="verdict-desc" class="verdict-desc">Evaluating signal vectors...</div>
+          </div>
+        </div>
+
+        <!-- 8-Layer Signal Breakdown -->
+        <div class="signals-section">
+          <div class="signals-title">8-LAYER THREAT INTELLIGENCE</div>
+          <div id="signals-grid" class="signals-grid">
+            <!-- Populated via popup.js -->
+          </div>
+        </div>
+
+        <!-- Red Flags -->
+        <div id="flags-container" class="flags-container hidden">
+          <div class="flags-title">IDENTIFIED THREAT MARKERS</div>
+          <ul id="flags-list" class="flags-list"></ul>
+        </div>
+
+        <!-- Deep Dossier Link -->
+        <a id="deep-scan-link" href="#" target="_blank" class="deep-scan-btn">
+          Open Full Forensic Security Dossier ↗
+        </a>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <span>Connected to Local Node (127.0.0.1:8000)</span>
+      <a href="http://127.0.0.1:5173" target="_blank" class="app-link">Open Dashboard</a>
+    </footer>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

@@ -1,0 +1,35 @@
+# Git
+.git
+.gitignore
+
+# Environment & local credentials
+.env
+.env.local
+*.local.db
+app_local.db
+
+# Python
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache
+.coverage
+htmlcov
+.venv
+venv/
+ENV/
+
+# Node & Frontend build
+node_modules/
+dist/
+build/
+.oxlintrc.json
+npm-debug.log*
+
+# OS & Editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp

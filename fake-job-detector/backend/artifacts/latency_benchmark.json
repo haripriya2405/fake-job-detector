@@ -1,0 +1,35 @@
+{
+  "timestamp": "2026-08-19T10:26:24Z",
+  "baseline": {
+    "model_version": "v1.0.0",
+    "algorithm": "LogisticRegression",
+    "model_type": "sklearn",
+    "iterations": 100,
+    "warmup_mean_ms": 33.78,
+    "mean_latency_ms": 7.37,
+    "p50_latency_ms": 6.99,
+    "p95_latency_ms": 9.93,
+    "p99_latency_ms": 10.54,
+    "min_latency_ms": 5.34,
+    "max_latency_ms": 10.74,
+    "throughput_req_per_sec": 135.51,
+    "peak_ram_mb": 0.28,
+    "meets_50ms_p95_target": true
+  },
+  "candidate": {
+    "model_version": "transformer-cloud-1787075009",
+    "algorithm": "Transformer-ONNX",
+    "model_type": "onnx",
+    "iterations": 100,
+    "warmup_mean_ms": 1343.85,
+    "mean_latency_ms": 1322.38,
+    "p50_latency_ms": 1308.24,
+    "p95_latency_ms": 1407.33,
+    "p99_latency_ms": 1560.17,
+    "min_latency_ms": 1222.53,
+    "max_latency_ms": 1742.41,
+    "throughput_req_per_sec": 0.76,
+    "peak_ram_mb": 0.11,
+    "meets_50ms_p95_target": false
+  }
+}

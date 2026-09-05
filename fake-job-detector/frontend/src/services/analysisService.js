@@ -1,0 +1,158 @@
+import apiClient from './api';
+
+export const analysisService = {
+  async analyzeText(text, metadata = {}) {
+    try {
+      const response = await apiClient.post('/analysis', {
+        raw_content: text,
+        job_title: metadata.job_title,
+        company_name: metadata.company_name,
+        source_type: 'text'
+      });
+      if (response.data?.id) {
+        const history = JSON.parse(localStorage.getItem('sentinel_scan_history') || '[]');
+        localStorage.setItem('sentinel_scan_history', JSON.stringify([response.data, ...history.filter(h => h.id !== response.data.id)]));
+        return response.data;
+      }
+      throw new Error('Analysis response missing ID');
+    } catch (err) {
+      const errMsg = err.response?.data?.detail || err.message || 'Analysis failed';
+      throw new Error(errMsg);
+    }
+  },
+
+  async analyzeUpload(file, type = 'pdf', metadata = {}) {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('source_type', type);
+      if (metadata.job_title) formData.append('job_title', metadata.job_title);
+      if (metadata.company_name) formData.append('company_name', metadata.company_name);
+
+      const response = await apiClient.post('/analysis/upload', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      if (response.data?.id) {
+        const history = JSON.parse(localStorage.getItem('sentinel_scan_history') || '[]');
+        localStorage.setItem('sentinel_scan_history', JSON.stringify([response.data, ...history.filter(h => h.id !== response.data.id)]));
+        return response.data;
+      }
+      throw new Error('Upload analysis response missing ID');
+    } catch (err) {
+      const errMsg = err.response?.data?.detail || err.message || 'File analysis failed';
+      throw new Error(errMsg);
+    }
+  },
+
+  async analyzeUrl(jobUrl, metadata = {}) {
+    try {
+      const response = await apiClient.post('/analysis/url', {
+        job_url: jobUrl,
+        job_title: metadata.job_title,
+        company_name: metadata.company_name,
+      });
+      if (response.data?.id) {
+        const history = JSON.parse(localStorage.getItem('sentinel_scan_history') || '[]');
+        localStorage.setItem('sentinel_scan_history', JSON.stringify([response.data, ...history.filter(h => h.id !== response.data.id)]));
+        return response.data;
+      }
+      throw new Error('URL analysis response missing ID');
+    } catch (err) {
+      const errMsg = err.response?.data?.detail || err.message || 'URL analysis failed';
+      throw new Error(errMsg);
+    }
+  },
+
+  async getAnalysisById(id) {
+    try {
+      const response = await apiClient.get(`/analysis/${id}`);
+      if (response.data?.id) {
+        return response.data;
+      }
+    } catch (err) {
+      // Check locally cached user scan history
+      const history = JSON.parse(localStorage.getItem('sentinel_scan_history') || '[]');
+      const foundInHistory = history.find((a) => a.id === id);
+      if (foundInHistory) return foundInHistory;
+      
+      const errMsg = err.response?.data?.detail || err.message || 'Report not found';
+      throw new Error(errMsg);
+    }
+
+    const history = JSON.parse(localStorage.getItem('sentinel_scan_history') || '[]');
+    const foundInHistory = history.find((a) => a.id === id);
+    if (foundInHistory) return foundInHistory;
+
+    throw new Error(`Analysis report '${id}' not found`);
+  },
+
+  async getHistory() {
+    try {
+      const response = await apiClient.get('/analysis/history');
+      if (Array.isArray(response.data)) {
+        return response.data;
+      }
+    } catch (err) {
+      console.warn('Backend history fetch unavailable, retrieving local user history:', err.message);
+    }
+
+    return JSON.parse(localStorage.getItem('sentinel_scan_history') || '[]');
+  },
+
+  async analyzeBatch(jobsList) {
+    try {
+      const response = await apiClient.post('/analysis/batch', {
+        items: jobsList.map(j => ({
+          raw_content: j.raw_content || j.text,
+          job_title: j.job_title || j.title,
+          company_name: j.company_name || j.company,
+          source_type: 'text'
+        }))
+      });
+      if (response.data?.results) {
+        const history = JSON.parse(localStorage.getItem('sentinel_scan_history') || '[]');
+        const newItems = response.data.results;
+        localStorage.setItem('sentinel_scan_history', JSON.stringify([...newItems, ...history]));
+        return response.data;
+      }
+      throw new Error('Batch response missing results');
+    } catch (err) {
+      const errMsg = err.response?.data?.detail || err.message || 'Batch analysis failed';
+      throw new Error(errMsg);
+    }
+  },
+
+  async exportCsv() {
+    try {
+      const response = await apiClient.get('/analysis/export/csv', {
+        responseType: 'blob',
+      });
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'jobscamscore_audit_history.csv');
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      return true;
+    } catch (err) {
+      const errMsg = err.response?.data?.detail || err.message || 'Export CSV failed';
+      throw new Error(errMsg);
+    }
+  },
+
+  async deleteAnalysis(id) {
+    try {
+      await apiClient.delete(`/analysis/${id}`);
+    } catch (err) {
+      console.warn('Backend delete unavailable, removing locally:', err.message);
+    }
+
+    const history = JSON.parse(localStorage.getItem('sentinel_scan_history') || '[]');
+    const filtered = history.filter((a) => a.id !== id);
+    localStorage.setItem('sentinel_scan_history', JSON.stringify(filtered));
+    return { success: true };
+  }
+};
+
+export default analysisService;

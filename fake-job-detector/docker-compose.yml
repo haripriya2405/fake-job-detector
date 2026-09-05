@@ -1,0 +1,98 @@
+# ==============================================================================
+# SentinelJob AI — Production Docker Compose Orchestration (Phase 18)
+# ==============================================================================
+
+version: '3.8'
+
+services:
+  # PostgreSQL 16 Relational Store
+  postgres:
+    image: postgres:16-alpine
+    container_name: sentineljob-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-fake_job_detector}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-sentinel_production_db_pass_948f}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-fake_job_detector}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - sentinel_network
+
+  # FastAPI Backend Service (Tesseract OCR enabled, non-root)
+  backend:
+    build:
+      context: .
+      dockerfile: docker/backend/Dockerfile
+    container_name: sentineljob-backend
+    restart: unless-stopped
+    environment:
+      APPLICATION_ENV: production
+      ENVIRONMENT: production
+      DEBUG: "false"
+      APP_NAME: "SentinelJob AI Backend"
+      API_V1_STR: "/api/v1"
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-sentinel_production_db_pass_948f}@postgres:5432/${POSTGRES_DB:-fake_job_detector}
+      DB_POOL_SIZE: 10
+      DB_MAX_OVERFLOW: 20
+      DB_POOL_TIMEOUT: 30
+      DB_POOL_RECYCLE: 1800
+      SECRET_KEY: ${SECRET_KEY:-sentinel_jwt_secret_production_key_change_in_real_deploy_948f}
+      ALGORITHM: HS256
+      ACCESS_TOKEN_EXPIRE_MINUTES: 1440
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000,http://127.0.0.1:3000}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3000}
+      RATE_LIMIT_ENABLED: "true"
+      RATE_LIMIT_PER_MINUTE: 60
+      RATE_LIMIT_AUTH_PER_MINUTE: 15
+      RATE_LIMIT_ANALYSIS_PER_MINUTE: 20
+      MAX_UPLOAD_SIZE_MB: 10
+      OCR_TIMEOUT_SECONDS: 10
+      URL_FETCH_TIMEOUT_SECONDS: 8
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    networks:
+      - sentinel_network
+
+  # Nginx Frontend & Reverse Proxy
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/frontend/Dockerfile
+    container_name: sentineljob-frontend
+    restart: unless-stopped
+    ports:
+      - "${PORT:-3000}:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost/"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    networks:
+      - sentinel_network
+
+volumes:
+  postgres_data:
+    name: sentineljob_postgres_data
+
+networks:
+  sentinel_network:
+    name: sentineljob_network
+    driver: bridge

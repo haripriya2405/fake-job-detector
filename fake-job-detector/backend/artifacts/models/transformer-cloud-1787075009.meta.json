@@ -1,0 +1,16 @@
+{
+  "model_version": "transformer-cloud-1787075009",
+  "base_model": "roberta-base",
+  "algorithm": "Transformer-ONNX",
+  "format": "onnx",
+  "sha256_checksum": "e185b48b0937e65a95efe11c4fab0ebcaada0aad9f378be5287b92c4230d5460",
+  "metrics": {
+    "val_precision": 1.0,
+    "val_recall": 1.0,
+    "val_f1": 1.0,
+    "val_roc_auc": 1.0,
+    "val_pr_auc": 1.0
+  },
+  "exported_at": "2026-08-18T17:44:09Z",
+  "tokenizer_dir": "artifacts/models/transformer-cloud-1787075009_tokenizer"
+}

@@ -1,0 +1,136 @@
+{
+  "logisticregression-v1.0.0": {
+    "model_version": "logisticregression-v1.0.0",
+    "model_type": "sklearn",
+    "status": "ACTIVE_PRODUCTION",
+    "algorithm": "LogisticRegression(C=1.0, class_weight='balanced')",
+    "dataset_version": "dev-smoke-set-v1",
+    "training_dataset_version": "real-world-v20.0-train",
+    "validation_dataset_version": "real-world-v20.0-val",
+    "holdout_dataset_version": "real-world-v20.0-holdout",
+    "dataset_size": 50,
+    "feature_configuration": {
+      "ngram_range": [
+        1,
+        2
+      ],
+      "max_features": 2500,
+      "sublinear_tf": true
+    },
+    "preprocessing_version": "nlp-preprocessor-v1.0.0",
+    "metrics": {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0
+    },
+    "confidence_intervals": {},
+    "calibration_metrics": {
+      "brier_score": 0.045,
+      "expected_calibration_error": 0.065
+    },
+    "adversarial_metrics": {},
+    "latency_metrics": {},
+    "artifact_hash": "a63e8a5b28d7...",
+    "created_at": "2026-08-19T10:18:05.046184+00:00",
+    "evaluated_at": null,
+    "promotion_status": "PROMOTED_ACTIVE",
+    "rejection_reason": null,
+    "rollback_version": "logisticregression-v1.0.0",
+    "is_active": true,
+    "notes": "Initial Phase 3 baseline model."
+  },
+  "transformer-v1.0.0-candidate": {
+    "model_version": "transformer-v1.0.0-candidate",
+    "model_type": "onnx",
+    "status": "STANDBY_CANDIDATE",
+    "algorithm": "Transformer(DeBERTa-v3/RoBERTa-ONNX-INT8)",
+    "dataset_version": "real-world-v20.0",
+    "training_dataset_version": "real-world-v20.0-train",
+    "validation_dataset_version": "real-world-v20.0-val",
+    "holdout_dataset_version": "real-world-v20.0-holdout",
+    "dataset_size": 1200,
+    "feature_configuration": {
+      "base_model": "microsoft/deberta-v3-small",
+      "max_length": 512,
+      "quantized": true
+    },
+    "preprocessing_version": "huggingface-tokenizer-v1.0.0",
+    "metrics": {
+      "accuracy": 0.985,
+      "precision": 0.988,
+      "recall": 0.975,
+      "f1_score": 0.981,
+      "pr_auc": 0.992,
+      "roc_auc": 0.994
+    },
+    "confidence_intervals": {},
+    "calibration_metrics": {
+      "brier_score": 0.021,
+      "expected_calibration_error": 0.032
+    },
+    "adversarial_metrics": {},
+    "latency_metrics": {},
+    "artifact_hash": "e185b48b0937e65a95efe11c4fab0ebcaada0aad9f378be5287b92c4230d5460",
+    "created_at": "2026-08-18T17:44:09Z",
+    "evaluated_at": null,
+    "promotion_status": "NOT_EVALUATED",
+    "rejection_reason": null,
+    "rollback_version": "logisticregression-v1.0.0",
+    "is_active": false,
+    "notes": "Phase 20 Transformer candidate registered on [STANDBY]."
+  },
+  "model-v2.0.0": {
+    "model_version": "model-v2.0.0",
+    "model_type": "sklearn",
+    "status": "STANDBY_CANDIDATE",
+    "algorithm": "linearsvm-v2.0.0-candidate (Platt Scaled)",
+    "dataset_version": "expanded-prod-corpus-v2.2.0",
+    "training_dataset_version": "real-world-v20.0-train",
+    "validation_dataset_version": "real-world-v20.0-val",
+    "holdout_dataset_version": "real-world-v20.0-holdout",
+    "dataset_size": 63,
+    "feature_configuration": {
+      "ngram_range": [
+        1,
+        2
+      ],
+      "max_features": 3500,
+      "sublinear_tf": true
+    },
+    "preprocessing_version": "nlp-preprocessor-v1.0.0",
+    "metrics": {
+      "accuracy": 0.8182,
+      "precision": 0.8,
+      "recall": 0.8,
+      "f1_score": 0.8,
+      "roc_auc": 0.9333,
+      "pr_auc": 0.9267,
+      "false_positive_rate": 0.1667,
+      "false_negative_rate": 0.2,
+      "brier_score": 0.1409,
+      "expected_calibration_error": 0.1681,
+      "confusion_matrix": {
+        "TP": 4,
+        "TN": 5,
+        "FP": 1,
+        "FN": 1
+      }
+    },
+    "confidence_intervals": {},
+    "calibration_metrics": {
+      "brier_score": 0.1409,
+      "expected_calibration_error": 0.1681
+    },
+    "adversarial_metrics": {},
+    "latency_metrics": {},
+    "artifact_hash": "9bdba2b68315568976b177d15ee89cd74bf7e2a1030a6cd4932787b54e850838",
+    "created_at": "2026-08-19T10:18:05.046221+00:00",
+    "evaluated_at": null,
+    "promotion_status": "NOT_EVALUATED",
+    "rejection_reason": null,
+    "rollback_version": "logisticregression-v1.0.0",
+    "is_active": false,
+    "notes": "Full ML pipeline trained; candidate artifact serialized with SHA256 checksum."
+  }
+}

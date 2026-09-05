@@ -1,0 +1,211 @@
+{
+  "dataset_version": "real-world-v20.0",
+  "ingestion_stats": {
+    "total_input_records": 64,
+    "accepted_records": 64,
+    "rejected_records_count": 0,
+    "fraud_count": 29,
+    "legitimate_count": 35,
+    "provenance_sources": [
+      "Academic Jobs Online",
+      "Contemporary Holdout Threat Logs",
+      "Corporate Onboarding Portal",
+      "Design Community Board",
+      "FTC Consumer Alerts & IC3 Scam Bulletins",
+      "Fintech Career Board",
+      "Government Recruitment Portal",
+      "Greenhouse ATS Portal",
+      "Hospital Career Portal",
+      "Public Enterprise Job Listings",
+      "Public Startup Listing",
+      "Reported Threat Intelligence Feed",
+      "Startup Job Portal",
+      "University Career Bulletin",
+      "Venture Capital Job Board"
+    ],
+    "categories": [
+      "academic_research",
+      "advance_fee",
+      "adversarial_evasion",
+      "borderline_startup",
+      "cashier_check",
+      "crypto_task",
+      "healthcare",
+      "impersonation",
+      "pii_phishing",
+      "public_sector",
+      "tech_enterprise"
+    ]
+  },
+  "partitions": {
+    "train_count": 38,
+    "validation_count": 13,
+    "holdout_count": 13
+  },
+  "power_assessment": {
+    "sample_size": 13,
+    "min_required_sample_size": 384,
+    "is_adequately_powered": false,
+    "status": "INSUFFICIENT_STATISTICAL_EVIDENCE",
+    "estimated_margin_of_error": 0.2718030961503623,
+    "recommendation": "Holdout dataset size is below N=384. Statistical evidence is insufficient for autonomous promotion."
+  },
+  "holdout_records": [
+    {
+      "record_id": "RW-0030",
+      "text": "PixelCraft Labs is looking for a Junior React Developer in Bangalore. React, Tailwind CSS, REST APIs. Our talent team conducts a preliminary 10-minute screening via WhatsApp at +919876543210. Visit https://pixelcraftlabs.com/jobs for details.",
+      "source": "Startup Job Portal",
+      "source_url": null,
+      "collection_date": "2026-08-19",
+      "label": 0,
+      "category": "borderline_startup",
+      "content_hash": "913e9b1dff1794079101d326b1aa6ce73df6f8dfef1f299c2c487e01bb212da0",
+      "license": "UNKNOWN / Startup Career Page",
+      "dataset_version": "real-world-v20.0"
+    },
+    {
+      "record_id": "RW-0022",
+      "text": "Kaiser Permanente is hiring a certified Diagnostic Medical Sonographer. Perform abdominal, vascular, and OB/GYN ultrasound examinations. ARDMS certification required. Union healthcare benefits and pension. Submit credentials via https://www.kaiserpermanentejobs.org.",
+      "source": "Hospital Career Portal",
+      "source_url": null,
+      "collection_date": "2026-08-19",
+      "label": 0,
+      "category": "healthcare",
+      "content_hash": "cca4443a83fb3b72310104f69deb911ece32505aab35fafef5eb0235038555fd",
+      "license": "UNKNOWN / Hospital Healthcare Notice",
+      "dataset_version": "real-world-v20.0"
+    },
+    {
+      "record_id": "RW-0063",
+      "text": "Corporate procurement clerk. Company vendor check will be provided upon contact. Deposit company funds into your ATM and forward balance to courier via Zelle. Immediate start.",
+      "source": "Contemporary Holdout Threat Logs",
+      "source_url": null,
+      "collection_date": "2026-08-19",
+      "label": 1,
+      "category": "adversarial_evasion",
+      "content_hash": "aa67aa28db8923c41a7de64b9d6c8e113c979c0de105174b8c8ee9e12cab4b6b",
+      "license": "UNKNOWN / Adversarial Research",
+      "dataset_version": "real-world-v20.0"
+    },
+    {
+      "record_id": "RW-0025",
+      "text": "The CDC is seeking a Public Health Data Analyst in Atlanta, GA. Responsibilities: analyze epidemiological time-series data and publish weekly outbreak summaries. Proficiency in SQL and R. Apply through USAJOBS on https://www.cdc.gov/careers.",
+      "source": "Government Recruitment Portal",
+      "source_url": null,
+      "collection_date": "2026-08-19",
+      "label": 0,
+      "category": "public_sector",
+      "content_hash": "5a3e1cefa2f14545ec089a602fb8b11eddc41cd032b4725745696674bade2473",
+      "license": "UNKNOWN / US Government Public Domain",
+      "dataset_version": "real-world-v20.0"
+    },
+    {
+      "record_id": "RW-0045",
+      "text": "Corporate procurement clerk. Company vendor check will be provided upon contact. Deposit company funds into your ATM and forward balance to courier via Zelle. Immediate start without interview.",
+      "source": "FTC Consumer Alerts & IC3 Scam Bulletins",
+      "source_url": null,
+      "collection_date": "2026-08-19",
+      "label": 1,
+      "category": "cashier_check",
+      "content_hash": "90d452fa959da38cf1a40a7bdc010cc6eea00dc564b60b0e849b71e26a341f04",
+      "license": "UNKNOWN / Informational Advisory",
+      "dataset_version": "real-world-v20.0"
+    },
+    {
+      "record_id": "RW-0048",
+      "text": "Earn $400 daily rating Hollywood movies. Deposit 100 USDT into company crypto wallet to activate commission portal and unlock daily VIP withdrawal tasks. Connect on Telegram @StarMovie_Admin.",
+      "source": "FTC Consumer Alerts & IC3 Scam Bulletins",
+      "source_url": null,
+      "collection_date": "2026-08-19",
+      "label": 1,
+      "category": "crypto_task",
+      "content_hash": "c062aff6d302905101d49ae066147ef382931a16014461238dfe901a2e355651",
+      "license": "UNKNOWN / Informational Advisory",
+      "dataset_version": "real-world-v20.0"
+    },
+    {
+      "record_id": "RW-0052",
+      "text": "Boost luxury hotel ratings online. Instant daily payouts in Bitcoin. Complete 35 booking optimization clicks per day. Upgrade to VIP Level 2 by depositing $150 to withdraw accumulated commission balance.",
+      "source": "FTC Consumer Alerts & IC3 Scam Bulletins",
+      "source_url": null,
+      "collection_date": "2026-08-19",
+      "label": 1,
+      "category": "crypto_task",
+      "content_hash": "45bb1d13355cc4ad6a333aea5a3910da300b172355e081c19caab051b648a771",
+      "license": "UNKNOWN / Informational Advisory",
+      "dataset_version": "real-world-v20.0"
+    },
+    {
+      "record_id": "RW-0020",
+      "text": "Cleveland Clinic is hiring Clinical Laboratory Technologists. Perform diagnostic specimen testing and quality control assays. Bachelor's in Medical Laboratory Science required. Official application portal: https://my.clevelandclinic.org/careers.",
+      "source": "Hospital Career Portal",
+      "source_url": null,
+      "collection_date": "2026-08-19",
+      "label": 0,
+      "category": "healthcare",
+      "content_hash": "bfe4ab399ddad486a35ee4a4e215b635bb62f8da57c92064052db7eb9648773d",
+      "license": "UNKNOWN / Hospital Healthcare Notice",
+      "dataset_version": "real-world-v20.0"
+    },
+    {
+      "record_id": "RW-0044",
+      "text": "We send you a company check for $2,800. Cash it at your bank, purchase Google Play and Apple gift cards at Walmart, and send photos of the gift card codes to our supervisor on Telegram @RetailEval.",
+      "source": "FTC Consumer Alerts & IC3 Scam Bulletins",
+      "source_url": null,
+      "collection_date": "2026-08-19",
+      "label": 1,
+      "category": "cashier_check",
+      "content_hash": "02c5084b6ffcd4fee47a61d2dcfa89196481d0c896ce817730503593eb2fec65",
+      "license": "UNKNOWN / Informational Advisory",
+      "dataset_version": "real-world-v20.0"
+    },
+    {
+      "record_id": "RW-0014",
+      "text": "The Broad Institute is seeking a Bioinformatics Specialist to process genomic sequencing pipelines. Master's or Ph.D. in Computational Biology or Computer Science required. Python, R, and Nextflow pipeline experience. Apply at https://www.broadinstitute.org/careers.",
+      "source": "University Career Bulletin",
+      "source_url": null,
+      "collection_date": "2026-08-19",
+      "label": 0,
+      "category": "academic_research",
+      "content_hash": "83ab61c88c04f0efe46d2f98722b46ed4216d1b19efa10fb49248e1189e38b06",
+      "license": "UNKNOWN / University Academic Notice",
+      "dataset_version": "real-world-v20.0"
+    },
+    {
+      "record_id": "RW-0016",
+      "text": "CMU Robotics Institute is accepting applications from enrolled undergraduate students for Fall lab assistantships. ROS2, C++, and Linux experience preferred. Apply through the departmental student portal at https://ri.cmu.edu/education/undergrad.",
+      "source": "University Career Bulletin",
+      "source_url": null,
+      "collection_date": "2026-08-19",
+      "label": 0,
+      "category": "academic_research",
+      "content_hash": "2b908b2ba523c4c9c13777bd21d1f4f323044583ab41c35012be003173013827",
+      "license": "UNKNOWN / University Academic Notice",
+      "dataset_version": "real-world-v20.0"
+    },
+    {
+      "record_id": "RW-0058",
+      "text": "You have been selected for immediate employment! Send your bank login credentials, netbanking password, and debit card front and back photos to hr_payroll_services2026@gmail.com for direct deposit setup before call.",
+      "source": "FTC Consumer Alerts & IC3 Scam Bulletins",
+      "source_url": null,
+      "collection_date": "2026-08-19",
+      "label": 1,
+      "category": "pii_phishing",
+      "content_hash": "ef49e0015c6fc06b9b9063f9adad43f1227d35fb1f0c758e46524bb5ae3a6846",
+      "license": "UNKNOWN / Informational Advisory",
+      "dataset_version": "real-world-v20.0"
+    },
+    {
+      "record_id": "RW-0027",
+      "text": "NIST is seeking a Research Physical Scientist in Gaithersburg, MD. Conduct precision quantum measurement research and atomic clock frequency calibration. Federal civil service GS-13 grade. Apply via https://www.nist.gov/careers.",
+      "source": "Government Recruitment Portal",
+      "source_url": null,
+      "collection_date": "2026-08-19",
+      "label": 0,
+      "category": "public_sector",
+      "content_hash": "fd235dec84a33ab081e682eb00712a09feabb8b446fef14527974c6283b3892f",
+      "license": "UNKNOWN / US Government Public Domain",
+      "dataset_version": "real-world-v20.0"
+    }
+  ]
+}

@@ -1,0 +1,490 @@
+{
+  "report_version": "phase-20-v1.0",
+  "dataset_stats": {
+    "total_input_records": 64,
+    "accepted_records": 64,
+    "rejected_records_count": 0,
+    "fraud_count": 29,
+    "legitimate_count": 35,
+    "provenance_sources": [
+      "Academic Jobs Online",
+      "Contemporary Holdout Threat Logs",
+      "Corporate Onboarding Portal",
+      "Design Community Board",
+      "FTC Consumer Alerts & IC3 Scam Bulletins",
+      "Fintech Career Board",
+      "Government Recruitment Portal",
+      "Greenhouse ATS Portal",
+      "Hospital Career Portal",
+      "Public Enterprise Job Listings",
+      "Public Startup Listing",
+      "Reported Threat Intelligence Feed",
+      "Startup Job Portal",
+      "University Career Bulletin",
+      "Venture Capital Job Board"
+    ],
+    "categories": [
+      "academic_research",
+      "advance_fee",
+      "adversarial_evasion",
+      "borderline_startup",
+      "cashier_check",
+      "crypto_task",
+      "healthcare",
+      "impersonation",
+      "pii_phishing",
+      "public_sector",
+      "tech_enterprise"
+    ]
+  },
+  "holdout_size": 13,
+  "comparative_metrics": {
+    "evaluated_at": "2026-08-19T10:27:45.234399+00:00",
+    "holdout_size": 13,
+    "baseline": {
+      "model_version": "v1.0.0",
+      "algorithm": "LogisticRegression",
+      "sample_count": 13,
+      "confusion_matrix": {
+        "tp": 6,
+        "tn": 7,
+        "fp": 0,
+        "fn": 0
+      },
+      "metrics": {
+        "accuracy": 1.0,
+        "balanced_accuracy": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1_score": 1.0,
+        "specificity": 1.0,
+        "false_positive_rate": 0.0,
+        "false_negative_rate": 0.0,
+        "matthews_correlation_coefficient": 1.0,
+        "roc_auc": 1.0,
+        "pr_auc": 1.0,
+        "brier_score": 0.1702,
+        "expected_calibration_error": 0.223
+      },
+      "latency": {
+        "mean_ms": 6.66,
+        "p50_ms": 3.85,
+        "p95_ms": 19.13,
+        "p99_ms": 35.14
+      },
+      "raw_probabilities": [
+        0.4462,
+        0.4251,
+        0.596,
+        0.438,
+        0.5986,
+        0.6385,
+        0.5791,
+        0.4277,
+        0.6305,
+        0.3992,
+        0.4509,
+        0.608,
+        0.4152
+      ],
+      "raw_predictions": [
+        0,
+        0,
+        1,
+        0,
+        1,
+        1,
+        1,
+        0,
+        1,
+        0,
+        0,
+        1,
+        0
+      ],
+      "calibration_curve": {
+        "prob_true": [
+          0.0,
+          0.3333,
+          1.0
+        ],
+        "prob_pred": [
+          0.3992,
+          0.4863,
+          0.6257
+        ]
+      }
+    },
+    "candidate": {
+      "model_version": "transformer-cloud-1787075009",
+      "algorithm": "Transformer-ONNX",
+      "sample_count": 13,
+      "confusion_matrix": {
+        "tp": 6,
+        "tn": 7,
+        "fp": 0,
+        "fn": 0
+      },
+      "metrics": {
+        "accuracy": 1.0,
+        "balanced_accuracy": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1_score": 1.0,
+        "specificity": 1.0,
+        "false_positive_rate": 0.0,
+        "false_negative_rate": 0.0,
+        "matthews_correlation_coefficient": 1.0,
+        "roc_auc": 1.0,
+        "pr_auc": 1.0,
+        "brier_score": 0.0,
+        "expected_calibration_error": 0.0011
+      },
+      "latency": {
+        "mean_ms": 1357.15,
+        "p50_ms": 1351.25,
+        "p95_ms": 1498.63,
+        "p99_ms": 1505.22
+      },
+      "raw_probabilities": [
+        0.0012,
+        0.0021,
+        0.9997,
+        0.0007,
+        0.9997,
+        0.9996,
+        0.9997,
+        0.0007,
+        0.9997,
+        0.0007,
+        0.0054,
+        0.9996,
+        0.0009
+      ],
+      "raw_predictions": [
+        0,
+        0,
+        1,
+        0,
+        1,
+        1,
+        1,
+        0,
+        1,
+        0,
+        0,
+        1,
+        0
+      ],
+      "calibration_curve": {
+        "prob_true": [
+          0.0,
+          1.0
+        ],
+        "prob_pred": [
+          0.0017,
+          0.9997
+        ]
+      }
+    },
+    "delta_metrics": {
+      "accuracy": 0.0,
+      "balanced_accuracy": 0.0,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1_score": 0.0,
+      "specificity": 0.0,
+      "false_positive_rate": 0.0,
+      "false_negative_rate": 0.0,
+      "matthews_correlation_coefficient": 0.0,
+      "roc_auc": 0.0,
+      "pr_auc": 0.0,
+      "brier_score": -0.1702,
+      "expected_calibration_error": -0.2219
+    },
+    "statistical_significance": {
+      "mcnemar_test": {
+        "contingency_matrix": [
+          [
+            13,
+            0
+          ],
+          [
+            0,
+            0
+          ]
+        ],
+        "both_correct_count": 13,
+        "baseline_only_correct_count": 0,
+        "candidate_only_correct_count": 0,
+        "both_wrong_count": 0,
+        "statistic": 0.0,
+        "p_value": 1.0,
+        "test_type": "exact_binomial",
+        "is_significant": false,
+        "interpretation": "Identical predictions; no significant difference between models."
+      },
+      "paired_differences": {
+        "pr_auc": {
+          "metric": "pr_auc",
+          "baseline": {
+            "point_estimate": 1.0,
+            "ci_lower": 1.0,
+            "ci_upper": 1.0,
+            "std_error": 0.0
+          },
+          "candidate": {
+            "point_estimate": 1.0,
+            "ci_lower": 1.0,
+            "ci_upper": 1.0,
+            "std_error": 0.0
+          },
+          "absolute_difference": 0.0,
+          "relative_difference": 0.0,
+          "difference_95_ci": [
+            0.0,
+            0.0
+          ],
+          "is_statistically_significant": false
+        },
+        "f1": {
+          "metric": "f1",
+          "baseline": {
+            "point_estimate": 1.0,
+            "ci_lower": 1.0,
+            "ci_upper": 1.0,
+            "std_error": 0.0
+          },
+          "candidate": {
+            "point_estimate": 1.0,
+            "ci_lower": 1.0,
+            "ci_upper": 1.0,
+            "std_error": 0.0
+          },
+          "absolute_difference": 0.0,
+          "relative_difference": 0.0,
+          "difference_95_ci": [
+            0.0,
+            0.0
+          ],
+          "is_statistically_significant": false
+        },
+        "threat_recall": {
+          "metric": "threat_recall",
+          "baseline": {
+            "point_estimate": 1.0,
+            "ci_lower": 1.0,
+            "ci_upper": 1.0,
+            "std_error": 0.0
+          },
+          "candidate": {
+            "point_estimate": 1.0,
+            "ci_lower": 1.0,
+            "ci_upper": 1.0,
+            "std_error": 0.0
+          },
+          "absolute_difference": 0.0,
+          "relative_difference": 0.0,
+          "difference_95_ci": [
+            0.0,
+            0.0
+          ],
+          "is_statistically_significant": false
+        },
+        "false_positive_rate": {
+          "metric": "false_positive_rate",
+          "baseline": {
+            "point_estimate": 0.0,
+            "ci_lower": 0.0,
+            "ci_upper": 0.0,
+            "std_error": 0.0
+          },
+          "candidate": {
+            "point_estimate": 0.0,
+            "ci_lower": 0.0,
+            "ci_upper": 0.0,
+            "std_error": 0.0
+          },
+          "absolute_difference": 0.0,
+          "relative_difference": 0.0,
+          "difference_95_ci": [
+            0.0,
+            0.0
+          ],
+          "is_statistically_significant": false
+        }
+      }
+    }
+  },
+  "adversarial_benchmark": {
+    "baseline_accuracy": 1.0,
+    "candidate_accuracy": 0.875
+  },
+  "error_analysis": {
+    "total_analyzed": 13,
+    "summary_counts": {
+      "BOTH_CORRECT": 13,
+      "BASELINE_CORRECT": 0,
+      "TRANSFORMER_CORRECT": 0,
+      "BOTH_WRONG": 0,
+      "AMBIGUOUS": 0
+    },
+    "category_error_distribution": {
+      "fake_check_reimbursement": 3,
+      "upfront_fee_demand": 3,
+      "crypto_payment_task": 0,
+      "channel_diversion": 0,
+      "credential_harvesting": 0,
+      "recruiter_impersonation": 0,
+      "typosquatted_domain": 0,
+      "urgent_onboarding": 0,
+      "unusual_legitimate_job": 7,
+      "borderline_compensation": 0,
+      "linguistic_obfuscation": 0
+    },
+    "disagreement_count": 0,
+    "disagreement_cases": []
+  },
+  "promotion_gate": {
+    "candidate_version": "transformer-cloud-1787075009",
+    "baseline_version": "v1.0.0",
+    "evaluated_at": "2026-08-19T10:27:55.664559+00:00",
+    "holdout_size": 13,
+    "gate_checks": {
+      "Gate 1: Generalization (F1 >= 0.90, ROC-AUC >= 0.90)": {
+        "passed": true,
+        "detail": "F1=1.0000, ROC-AUC=1.0000"
+      },
+      "Gate 2: Low False Negatives (Recall >= 0.95)": {
+        "passed": true,
+        "detail": "Recall=1.0000 (Missed threat rate: 0.0000)"
+      },
+      "Gate 3: Controlled False Positives (FPR <= 0.05)": {
+        "passed": true,
+        "detail": "FPR=0.0000"
+      },
+      "Gate 4: Statistical Power & Adequacy (Target N >= 384)": {
+        "passed": false,
+        "detail": "Status=UNDERPOWERED (Sample Size Limited), Holdout N=13, Margin of Error=\u00b127.18%"
+      },
+      "Gate 5: Provenance & Licensing Documented": {
+        "passed": true,
+        "detail": "Every record verified with source reference and license/UNKNOWN status"
+      },
+      "Gate 6: Golden Benchmark Regression Safety": {
+        "passed": true,
+        "detail": "Zero regressions across golden benchmark cases"
+      },
+      "Gate 7: Artifact Integrity & SHA-256 Checksum": {
+        "passed": true,
+        "detail": "Model artifact hash recorded in version registry"
+      },
+      "Gate 8: Dual Calibration Metrics (Brier + ECE Separate)": {
+        "passed": true,
+        "detail": "Candidate Brier=0.0000, ECE=0.0011 vs Baseline Brier=0.1702, ECE=0.2230"
+      },
+      "Gate 9: PR-AUC Superiority (Candidate >= Baseline or >= 0.95)": {
+        "passed": true,
+        "detail": "Candidate PR-AUC=1.0000 vs Baseline PR-AUC=1.0000"
+      },
+      "Gate 10: Multi-pattern Adversarial Robustness (>= 90%)": {
+        "passed": false,
+        "detail": "Adversarial accuracy across 8 patterns: 87.5%"
+      },
+      "Gate 11: CPU Inference Latency Constraint (p95 <= 50ms)": {
+        "passed": false,
+        "detail": "Observed p95 latency: 1498.63ms"
+      },
+      "Gate 12: Token & Span Explainability Quality": {
+        "passed": true,
+        "detail": "Character offsets, sentence context, and feature contributions validated"
+      }
+    },
+    "criteria": [
+      {
+        "criterion": "Gate 1: Generalization (F1 >= 0.90, ROC-AUC >= 0.90)",
+        "passed": true,
+        "detail": "F1=1.0000, ROC-AUC=1.0000"
+      },
+      {
+        "criterion": "Gate 2: Low False Negatives (Recall >= 0.95)",
+        "passed": true,
+        "detail": "Recall=1.0000 (Missed threat rate: 0.0000)"
+      },
+      {
+        "criterion": "Gate 3: Controlled False Positives (FPR <= 0.05)",
+        "passed": true,
+        "detail": "FPR=0.0000"
+      },
+      {
+        "criterion": "Gate 4: Statistical Power & Adequacy (Target N >= 384)",
+        "passed": false,
+        "detail": "Status=UNDERPOWERED (Sample Size Limited), Holdout N=13, Margin of Error=\u00b127.18%"
+      },
+      {
+        "criterion": "Gate 5: Provenance & Licensing Documented",
+        "passed": true,
+        "detail": "Every record verified with source reference and license/UNKNOWN status"
+      },
+      {
+        "criterion": "Gate 6: Golden Benchmark Regression Safety",
+        "passed": true,
+        "detail": "Zero regressions across golden benchmark cases"
+      },
+      {
+        "criterion": "Gate 7: Artifact Integrity & SHA-256 Checksum",
+        "passed": true,
+        "detail": "Model artifact hash recorded in version registry"
+      },
+      {
+        "criterion": "Gate 8: Dual Calibration Metrics (Brier + ECE Separate)",
+        "passed": true,
+        "detail": "Candidate Brier=0.0000, ECE=0.0011 vs Baseline Brier=0.1702, ECE=0.2230"
+      },
+      {
+        "criterion": "Gate 9: PR-AUC Superiority (Candidate >= Baseline or >= 0.95)",
+        "passed": true,
+        "detail": "Candidate PR-AUC=1.0000 vs Baseline PR-AUC=1.0000"
+      },
+      {
+        "criterion": "Gate 10: Multi-pattern Adversarial Robustness (>= 90%)",
+        "passed": false,
+        "detail": "Adversarial accuracy across 8 patterns: 87.5%"
+      },
+      {
+        "criterion": "Gate 11: CPU Inference Latency Constraint (p95 <= 50ms)",
+        "passed": false,
+        "detail": "Observed p95 latency: 1498.63ms"
+      },
+      {
+        "criterion": "Gate 12: Token & Span Explainability Quality",
+        "passed": true,
+        "detail": "Character offsets, sentence context, and feature contributions validated"
+      }
+    ],
+    "verdict": "FAIL",
+    "eligible_for_promotion": false,
+    "active_model_unchanged": true,
+    "all_gates_passed": false,
+    "should_promote": false,
+    "decision_rationale": "Candidate model 'transformer-cloud-1787075009' failed one or more performance criteria. Candidate remains on [STANDBY]. Baseline 'v1.0.0' remains [ACTIVE PRODUCTION].",
+    "brier_vs_ece_analysis": "Candidate achieved Brier Loss of 0.0000 (vs Baseline 0.1702) and ECE of 0.0011 (vs Baseline 0.2230). Platt-scaled Linear SVM demonstrates lower Brier score due to sharper separation, while ECE remains 0.0011 (LogReg Baseline ECE=0.2230). Neither indicates perfect real-world probability calibration under limited sample size.",
+    "statistical_power_assessment": {
+      "holdout_size": 13,
+      "fraud_examples": 6,
+      "legitimate_examples": 7,
+      "target_adequate_sample_size": 384,
+      "is_adequately_powered": false,
+      "status": "UNDERPOWERED (Sample Size Limited)",
+      "estimated_margin_of_error": 0.2718,
+      "statistical_limitation_note": "Holdout N=13 has an estimated margin of error of \u00b127.18%. Statistical power is limited; large-scale generalization claims require N >= 384."
+    },
+    "active_model_retained": "v1.0.0"
+  },
+  "final_governance_state": {
+    "active_production_model": "logisticregression-v1.0.0",
+    "candidate_model": "transformer-v1.0.0-candidate",
+    "promotion_executed": false,
+    "rollback_available": true
+  }
+}

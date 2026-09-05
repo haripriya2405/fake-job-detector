@@ -1,0 +1,83 @@
+# Master Task Checklist
+
+- [x] Phase 1: Product Definition & Documentation Synthesis (Project Bible, Architecture, Database Blueprint)
+- [x] Phase 2: Frontend Architecture & Vite Environment Setup
+- [x] Phase 3: Dark Cybersecurity Design System & Tailwind Configuration
+- [x] Phase 4: Core Modular UI Component Library (Navbar, Sidebar, RiskGauge, MetricCards, Badges, Tabs)
+- [x] Phase 5: Complete Page Implementations (Landing, Login, Register, Dashboard, Analyze Job, Analysis Result, History, Detail, Settings, 404)
+- [x] Phase 6: Frontend Mock Service & Simulation Engine (Build validated and verified via browser)
+- [x] Phase 7: FastAPI Backend Foundation (FastAPI, Alembic, PostgreSQL models, Security, Auth, CORS, 16 unit tests)
+- [x] Phase 8: Real NLP + Machine Learning Engine (Phase 3: Dataset provenance, multi-dataset interfaces, calibration, ML output separation, 24 unit tests)
+- [x] Phase 9: Deterministic Security Rule Engine + Multi-Factor RiskEngine (Phase 4: 20+ heuristics, category caps, evidence extraction, 36 unit tests)
+- [x] Phase 10: Domain, Email & Company Verification Engine (Phase 5: Safe URL/RDAP/DNS/SSRF firewall, 52 unit tests)
+- [x] Phase 11: System Validation, Risk Calibration & Adversarial Testing (Phase 6: Golden benchmark, ECE/Brier corrections, 83 unit tests)
+- [x] Phase 12: Production ML Dataset + Model Training (Phase 7):
+  - [x] Production dataset ingestion & provenance tracking (`app/ml/production_dataset.py`)
+  - [x] Multi-model benchmarking (Baseline LR vs Candidate Tuned LR vs Platt-Scaled Linear SVM in `app/ml/trainer.py`)
+  - [x] Complete training documentation in `docs/PHASE-7-ML-TRAINING-REPORT.md`
+- [x] Phase 13: ML Dataset Expansion & Model Promotion Gate (Phase 7B):
+  - [x] Expanded multi-category corpus (64 raw, 63 clean accepted records across 11 vertical categories)
+  - [x] Multi-tier deduplication & near-duplicate filtering (Jaccard $\ge 0.88$)
+  - [x] Stratified zero-leakage partitions (43 Historical Train / 9 Validation / 11 Contemporary Holdout)
+  - [x] Formal 8-factor Model Promotion Gate (`app/ml/promotion_gate.py`)
+  - [x] Dual calibration analysis (Brier Score vs Expected Calibration Error [ECE] evaluated separately)
+  - [x] Model Promotion Decision: `model-v2.0.0` NOT promoted; `logisticregression-v1.0.0` retained as `[ACTIVE PRODUCTION]`
+- [x] Phase 14: Statistical Strengthening & Generalization Evaluation (Phase 7C):
+  - [x] 5-Fold Stratified Cross-Validation on development data (Accuracy: $0.9306 \pm 0.0569$, F1: $0.9029 \pm 0.0820$)
+  - [x] Non-parametric bootstrap confidence intervals ($B=1000$, 95% CI) reporting point estimates and uncertainty ranges
+  - [x] Cost-sensitive validation threshold grid search ($\tau \in [0.30, 0.70]$ on validation only; $\tau^* = 0.30$ single-pass holdout evaluation)
+  - [x] Statistical sample power adequacy assessment (Documenting $N=11$ holdout as `UNDERPOWERED` with margin of error $\pm 29.55\%$; target $N \ge 384$)
+  - [x] Exact ECE calibration reporting (LogReg v1: $0.1697$, LogReg v2: $0.1840$, Linear SVM: $0.1681$)
+  - [x] Formal Promotion Gate verdict: `model-v2.0.0` rejected; `logisticregression-v1.0.0` retained as `[ACTIVE PRODUCTION]`
+- [x] Phase 15: Full ML Training, Robustness Benchmark & Governance Completion (Phase 7D):
+  - [x] Dedicated Adversarial Robustness Benchmark (`app/ml/adversarial_dataset.py`) evaluated separately with 8 mutation patterns ($100\%$ detection)
+  - [x] Fine-grained validation threshold optimization ($\tau \in [0.10, 0.90]$ on validation data only; single holdout pass at $\tau^* = 0.30$)
+  - [x] Model artifact serialization with SHA-256 integrity checksum verification (`artifacts/models/`)
+  - [x] 12-factor promotion gate qualification; strict retention of `logisticregression-v1.0.0` as `[ACTIVE PRODUCTION]` and `model-v2.0.0` as `[CANDIDATE / STANDBY]`
+  - [x] Comprehensive report in `docs/PHASE-7D-FINAL-ML-TRAINING-REPORT.md`
+- [x] Phase 16: Multi-Modal Job Analysis: PDF + Image/OCR + Public Job URL (Phase 8):
+  - [x] Unified Ingestion Architecture (`app/ingestion/`: `base.py`, `schemas.py`, `sanitizer.py`, `limits.py`, `text.py`, `pdf.py`, `image.py`, `url.py`)
+  - [x] Safe PDF Parsing & Multi-Page Extraction (`app/ingestion/pdf.py`, header check, encryption check, page limits, no active script execution)
+  - [x] Image / Screenshot OCR Pipeline (`app/ocr/`: `base.py`, `preprocessing.py`, `service.py`, dimension clamping, bounding boxes, confidence scoring)
+  - [x] Public Job URL Ingestion with Hop-by-Hop SSRF Validation (`app/ingestion/url.py`, redirects $\le 5$, private IP blocking, content-type checks)
+  - [x] Multi-Modal API Endpoints: `POST /api/v1/analysis` (and `/text`), `POST /api/v1/analysis/upload`, `POST /api/v1/analysis/url`
+  - [x] Database Schema & Persistence Updates: Multi-modal metadata fields stored on `analyses` table
+  - [x] Frontend Multi-Modal Integration: `AnalyzeJobPage.jsx` (Text, PDF, Image, URL tabs), `analysisService.js`, `EvidenceViewer.jsx`
+  - [x] Complete test suite passing: **117/117 tests passing (100% pass rate)**
+  - [x] Architectural documentation completed in `docs/PHASE-8-MULTIMODAL-INGESTION.md`
+- [x] Phase 17: End-to-End Live Integration:
+  - [x] FastAPI + Vite frontend live connectivity with real backend API responses
+  - [x] E2E multi-modal workflows verified (Text, PDF upload, Image OCR, Public Job URL)
+  - [x] SSRF firewall validation & forensic evidence extraction
+  - [x] 138/138 backend tests passing (`docs/PHASE-17-E2E-INTEGRATION.md`)
+- [x] Phase 18: Production Hardening, Containerization & Deployment:
+  - [x] 3-tier Docker containerization (Nginx 1.27 + FastAPI ASGI + PostgreSQL 16)
+  - [x] Security middlewares, sliding window rate limiting, UUIDv4 request correlation
+  - [x] Production health probes (`/health`, `/ready`)
+  - [x] 144/144 backend tests passing (`docs/PHASE-18-PRODUCTION-HARDENING.md`)
+- [x] Phase 19: Advanced Transformer ML Subsystem:
+  - [x] Transformer fine-tuning pipeline (`app/ml/transformer_trainer.py`) with Asymmetric Focal Loss
+  - [x] Dynamic INT8 quantized ONNX Runtime graph export (`artifacts/models/transformer-cloud-1787075009.onnx`)
+  - [x] Token-level explainability spans and character offset attribution
+  - [x] 168/168 backend tests passing (`docs/PHASE-19-TRANSFORMER-ML.md`)
+- [x] Phase 20: Real-World ML Validation & Safe Model Promotion:
+  - [x] 64-record untouched holdout evaluation with zero-leakage partitions
+  - [x] 12-factor qualification gate enforcement
+  - [x] Latency gate rejection: baseline `logisticregression-v1.0.0` retained as `[ACTIVE PRODUCTION]`
+  - [x] 189/189 backend tests passing (`docs/PHASE-20-REAL-WORLD-VALIDATION.md`)
+- [x] Phase 21: JobScamScore 8-Layer Signal Intelligence & Market Verification:
+  - [x] 8-Layer Parallel Signal Intelligence Stack (`app/services/signals_engine.py`)
+  - [x] Real-world BLS & EMSCAD market salary feasibility benchmarking
+  - [x] Enterprise ATS live verification (Greenhouse, Lever, Workday, Ashby, SmartRecruiters, BambooHR)
+  - [x] JobScamScore obsidian aesthetic redesign & Google OAuth button on auth pages
+  - [x] Red/Green flag evidence panel & 8-layer dashboard integration
+  - [x] 197/197 backend tests passing (`docs/PHASE-21-JOBSCAMESSCORE-SIGNAL-INTELLIGENCE.md`)
+- [x] Phase 22: Enterprise Feature Expansion, Batch Intelligence & Live Deployment:
+  - [x] Extended ATS & Career Platform integrations (Workable, Jobvite, Oracle Taleo, SAP SuccessFactors, Cornerstone OnDemand, Phenom, query tokens)
+  - [x] High-throughput Batch Job Scanning engine (`POST /api/v1/analysis/batch`) with aggregated risk statistics
+  - [x] Multi-format Forensic Report Export Subsystem (Historical CSV download via `/api/v1/analysis/export/csv`, printable Security Audit PDF, and JSON evidence dossiers)
+  - [x] JobScamScore Browser Extension (Manifest V3) for direct in-browser scanning on LinkedIn, Indeed, Glassdoor, and ATS job boards
+  - [x] Frontend Batch Scanner Tab & Export triggers integrated in `AnalyzeJobPage.jsx`, `AnalysisResultPage.jsx`, and `AnalysisHistoryPage.jsx`
+  - [x] Complete test suite passing: **213/213 tests passing (100% pass rate)**
+
+
