@@ -1,4 +1,4 @@
-﻿"""SentinelJob AI — Comprehensive AI Forensic Explainer & LLM Synthesis Engine.
+"""SentinelJob AI — Comprehensive AI Forensic Explainer & LLM Synthesis Engine.
 
 Synthesizes multi-modal extraction telemetry, neural transformer predictions,
 deterministic heuristic indicators, and RDAP/DNS verification results into
@@ -26,9 +26,11 @@ class AIExplainer:
         risk_level: str = "low",
         verification_signals: Optional[Dict[str, Any]] = None,
     ) -> Optional[Dict[str, Any]]:
-        """Call Gemini LLM API with strict factual grounding on verification signals."""
-        api_key = os.getenv("GEMINI_API_KEY") or os.getenv("LLM_API_KEY")
-        if not api_key:
+        """Call Gemini or OpenAI LLM API with strict factual grounding on verification signals."""
+        gemini_key = os.getenv("GEMINI_API_KEY") or os.getenv("LLM_API_KEY")
+        openai_key = os.getenv("OPENAI_API_KEY")
+
+        if not gemini_key and not openai_key:
             return None
 
         prompt = f"""
@@ -55,20 +57,48 @@ Respond STRICTLY in valid JSON format with the following keys:
 Do NOT hallucinate facts not present in the telemetry.
 """
 
-        try:
-            async with httpx.AsyncClient(timeout=10.0) as client:
-                url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
-                payload = {
-                    "contents": [{"parts": [{"text": prompt}]}],
-                    "generationConfig": {"temperature": 0.2, "responseMimeType": "application/json"}
-                }
-                resp = await client.post(url, json=payload)
-                if resp.status_code == 200:
-                    result = resp.json()
-                    text_content = result["candidates"][0]["content"]["parts"][0]["text"]
-                    return json.loads(text_content)
-        except Exception as e:
-            logger.warning(f"LLM API call failed, falling back to deterministic synthesis: {e}")
+        # 1. Try Gemini API
+        if gemini_key:
+            try:
+                async with httpx.AsyncClient(timeout=10.0) as client:
+                    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={gemini_key}"
+                    payload = {
+                        "contents": [{"parts": [{"text": prompt}]}],
+                        "generationConfig": {"temperature": 0.2, "responseMimeType": "application/json"}
+                    }
+                    resp = await client.post(url, json=payload)
+                    if resp.status_code == 200:
+                        result = resp.json()
+                        text_content = result["candidates"][0]["content"]["parts"][0]["text"]
+                        return json.loads(text_content)
+            except Exception as e:
+                logger.warning(f"Gemini API call failed: {e}")
+
+        # 2. Try OpenAI API
+        if openai_key:
+            try:
+                async with httpx.AsyncClient(timeout=10.0) as client:
+                    url = "https://api.openai.com/v1/chat/completions"
+                    headers = {
+                        "Authorization": f"Bearer {openai_key}",
+                        "Content-Type": "application/json"
+                    }
+                    payload = {
+                        "model": "gpt-4o-mini",
+                        "messages": [
+                            {"role": "system", "content": "You are a cyber fraud forensic investigator. Output strictly valid JSON."},
+                            {"role": "user", "content": prompt}
+                        ],
+                        "response_format": {"type": "json_object"},
+                        "temperature": 0.2
+                    }
+                    resp = await client.post(url, headers=headers, json=payload)
+                    if resp.status_code == 200:
+                        result = resp.json()
+                        text_content = result["choices"][0]["message"]["content"]
+                        return json.loads(text_content)
+            except Exception as e:
+                logger.warning(f"OpenAI API call failed: {e}")
 
         return None
 
@@ -84,6 +114,9 @@ Do NOT hallucinate facts not present in the telemetry.
         ml_highlights: Optional[List[Dict[str, Any]]] = None,
         triggered_indicators: Optional[List[Any]] = None,
         verification_signals: Optional[List[Any]] = None,
+        salary_explanation: Optional[str] = None,
+        careers_explanation: Optional[str] = None,
+        recruiter_email: Optional[str] = None,
         page_count: Optional[int] = None,
         extraction_method: Optional[str] = None,
     ) -> str:
@@ -125,32 +158,34 @@ Do NOT hallucinate facts not present in the telemetry.
         lines.append("\n#### AI Neural Linguistic Analysis:")
         if ml_prob > 0.60:
             lines.append(
-                f"• The Deep Transformer model detected strong linguistic manipulation patterns with **{ml_prob * 100:.1f}% statistical confidence** towards fraudulent behavior."
+                f"• The Deep NLP Classifier detected strong linguistic manipulation patterns with **{ml_prob * 100:.1f}% statistical probability** of deceptive recruitment behavior."
             )
         elif ml_prob > 0.25:
             lines.append(
-                f"• The Deep Transformer model flagged mild manipulative phrasing with **{ml_prob * 100:.1f}% probability** of non-standard recruitment behavior."
+                f"• The Deep NLP Classifier flagged moderate non-standard phrasing with **{ml_prob * 100:.1f}% probability** of non-standard recruitment behavior."
             )
         else:
             lines.append(
-                f"• The Deep Transformer model identified standard, professional corporate recruitment terminology with **{(1 - ml_prob) * 100:.1f}% confidence** in its legitimacy."
+                f"• The Deep NLP Classifier identified authentic, professional corporate recruitment terminology with **{(1 - ml_prob) * 100:.1f}% confidence** in its legitimacy."
             )
 
         # Highlighted Manipulative Spans
         if ml_highlights:
             lines.append("\n**Key Flagged Phrases:**")
             seen_spans = set()
-            for h in ml_highlights[:4]:
+            for h in ml_highlights[:5]:
                 matched = h.get("matched_text", "")
                 cat = h.get("category", "manipulation").replace("_", " ").title()
                 if matched and matched.lower() not in seen_spans:
                     seen_spans.add(matched.lower())
-                    lines.append(f"  - **{cat}**: *\"{matched}\"* — {h.get('context_sentence', '')}")
+                    ctx = h.get("context_sentence", "").strip()
+                    ctx_str = f" — *\"{ctx}\"*" if ctx else ""
+                    lines.append(f"  - **{cat}**: \"`{matched}`\"{ctx_str}")
 
         # 3. Rule Engine & Threat Signals
         if triggered_indicators:
             lines.append("\n#### Identified Threat Signals:")
-            for ind in triggered_indicators[:5]:
+            for ind in triggered_indicators[:6]:
                 name = getattr(ind, "name", getattr(ind, "title", str(ind)))
                 desc = getattr(ind, "explanation", getattr(ind, "description", ""))
                 sev = getattr(ind, "severity", "medium").upper()
@@ -159,22 +194,31 @@ Do NOT hallucinate facts not present in the telemetry.
         # 4. Domain & Identity Assessment
         if verification_signals:
             lines.append("\n#### Entity & Domain Verification:")
-            for s in verification_signals[:3]:
+            for s in verification_signals[:4]:
                 s_name = getattr(s, "name", str(s))
                 s_desc = getattr(s, "description", "")
                 lines.append(f"• **{s_name}**: {s_desc}")
 
-        # 5. Actionable Next Steps
+        # 5. Compensation & Market Alignment
+        if salary_explanation:
+            lines.append(f"\n#### Market Compensation Benchmark:\n• {salary_explanation}")
+
+        # 6. Careers Page & Channel Authenticity
+        if careers_explanation:
+            lines.append(f"\n#### Careers Page & Application Channel:\n• {careers_explanation}")
+
+        # 7. Actionable Next Steps
         lines.append("\n#### Recommended Next Steps:")
         if risk_level in ["critical", "high"]:
-            lines.append("1. **Do not send money or banking info**: Never purchase equipment from vendor links or accept cashier checks.")
+            lines.append("1. **Do not send money or banking info**: Never purchase equipment from vendor links or deposit cashier checks.")
             lines.append("2. **Do not communicate off-platform**: Cease communication immediately if asked to move to Telegram, WhatsApp, or personal email.")
             lines.append("3. **Cross-reference officially**: Search the legitimate company's official career portal to confirm if the requisition ID actually exists.")
         elif risk_level == "medium":
             lines.append("1. **Verify recruiter credentials**: Confirm the sender's identity through official LinkedIn corporate staff profiles or corporate email domain.")
             lines.append("2. **Refuse upfront fees**: Legitimate employers will never request security deposits, background check fees, or training costs.")
+            lines.append("3. **Cross-verify posting**: Check if this exact role is advertised on the company's verified primary domain.")
         else:
-            lines.append("1. **Standard Due Diligence**: The posting shows no high-risk markers. Ensure you submit your application through the employer's official verified portal.")
+            lines.append("1. **Standard Due Diligence**: The posting shows clean metrics. Ensure you submit your application directly through the employer's official verified portal.")
 
         return "\n".join(lines)
 

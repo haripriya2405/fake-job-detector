@@ -40,6 +40,8 @@ from app.schemas.analysis import (
 from app.verification.service import verification_service
 from app.services.ai_explainer import ai_explainer
 from app.services.careers_page_service import careers_page_service
+from app.services.phone_carrier_service import phone_carrier_service
+from app.services.fraud_watchlist_service import fraud_watchlist_service
 from app.services.reputation_intelligence_service import reputation_intelligence_service
 from app.services.salary_benchmark_service import salary_benchmark_service
 
@@ -161,12 +163,20 @@ class AnalysisService:
         has_free_email = any("@gmail." in record.raw_content.lower() or "@yahoo." in record.raw_content.lower() or "@hotmail." in record.raw_content.lower() for _ in [1])
         has_telegram_scam = any("telegram" in record.raw_content.lower() or "whatsapp" in record.raw_content.lower() for _ in [1])
 
+        has_disposable_email = False
+        from app.verification.service import DISPOSABLE_EMAIL_PROVIDERS, EMAIL_REGEX
+        extracted_emails = EMAIL_REGEX.findall(record.raw_content)
+        for _, domain in extracted_emails:
+            if domain.lower() in DISPOSABLE_EMAIL_PROVIDERS:
+                has_disposable_email = True
+                break
+
         rules_dict_list = [{"rule_id": ind.title, "name": ind.title, "description": ind.description or "", "severity": ind.severity.upper()} for ind in record.indicators]
         reputation_info = reputation_intelligence_service.evaluate_reputation(
             domain=ver_record.domain_checked if ver_record else None,
             domain_age_days=age_days if age_days > 0 else None,
             is_free_email=has_free_email,
-            is_disposable_email=False,
+            is_disposable_email=has_disposable_email,
             is_official_ats=careers_info.is_official_ats,
             has_mx_records=ver_record.mx_record_valid if ver_record else False,
             salary_unrealistic=salary_info.is_unrealistic_high,
@@ -316,6 +326,12 @@ class AnalysisService:
             signals_8_layer=signals_8_stack,
             red_flags=reputation_info.red_flags,
             green_flags=reputation_info.green_flags,
+            # Phase 24 Feature 4 Contact & Fraud Watchlists
+            phone_intelligence=phone_carrier_service.analyze_contact_phones(record.raw_content or ""),
+            fraud_watchlists=fraud_watchlist_service.cross_reference_posting(
+                text=record.raw_content or "",
+                company_name=record.company_name,
+            ),
         )
 
     def create_analysis_from_normalized(
@@ -358,6 +374,15 @@ class AnalysisService:
             f"{ml_result.get('model_version', 'ml')}+{rule_result.rule_version}+{verification_result.verification_version}"
         )
 
+        # Compute preliminary salary & careers context for rich grounded explanation
+        salary_info_pre = salary_benchmark_service.evaluate_compensation(raw_text, job_title=job_title)
+        careers_url_pre = verification_result.extracted_urls[0].url if verification_result.extracted_urls else None
+        careers_info_pre = careers_page_service.verify_careers_origin(
+            url=careers_url_pre,
+            text=raw_text,
+            company_name=company_name,
+        )
+
         # Generate Comprehensive AI Forensic Explanation
         rich_explanation = ai_explainer.generate_explanation(
             raw_text=raw_text,
@@ -366,10 +391,12 @@ class AnalysisService:
             source_type=normalized.source_type.value.lower(),
             risk_score=risk_result.final_score,
             risk_level=risk_result.risk_level,
-            ml_prob=float(ml_result.get("probability", 0.0)),
+            ml_prob=float(ml_result.get("probability", ml_result.get("ml_probability", 0.0))),
             ml_highlights=ml_result.get("highlight_spans", []),
             triggered_indicators=risk_result.triggered_indicators,
             verification_signals=verification_result.signals if verification_result else [],
+            salary_explanation=salary_info_pre.explanation if salary_info_pre.detected_salary_text else None,
+            careers_explanation=careers_info_pre.explanation,
             page_count=normalized.page_count,
             extraction_method=normalized.extraction_method,
         )
@@ -682,4 +709,16 @@ class AnalysisService:
                 (r.explanation or "").replace("\n", " "),
             ])
         return output.getvalue()
+
+    def claim_analysis(self, analysis_id: uuid.UUID, current_user: User) -> AnalysisResponse:
+        """Associate an anonymous guest analysis report with a newly registered / logged-in user account."""
+        record = self.db.query(Analysis).filter(Analysis.id == analysis_id).first()
+        if not record:
+            raise NotFoundError(detail=f"Analysis report '{analysis_id}' was not found.")
+        
+        # Link user if unassigned or reassigning to current user
+        record.user_id = current_user.id
+        self.db.commit()
+        self.db.refresh(record)
+        return self._build_analysis_response(record)
 

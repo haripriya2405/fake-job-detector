@@ -69,3 +69,9 @@ artifacts/uploads/
 artifacts/scans/
 tmp/
 temp/
+
+# Large Datasets
+backend/data/*.csv
+backend/data/**/*.csv
+*.csv
+

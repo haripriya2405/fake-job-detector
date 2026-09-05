@@ -13,6 +13,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
 
 from app.core.logging import logger, setup_logging
+from app.ml.multi_dataset_ingestion import multi_dataset_ingestion
 from app.ml.production_dataset import ProductionDatasetIngestion
 from app.ml.promotion_gate import promotion_gate
 from app.ml.registry import ModelVersionMetadata, model_registry
@@ -31,6 +32,12 @@ def main():
         help="Model family to train and benchmark (classic=Scikit-Learn, transformer=DeBERTa-v3/ONNX, all=Both)",
     )
     parser.add_argument(
+        "--dataset-source",
+        choices=["multi", "curated"],
+        default="multi",
+        help="Dataset source: 'multi' (LinkedIn + SMS/WhatsApp + EMSCAD) or 'curated' (hand-curated threat corpus)",
+    )
+    parser.add_argument(
         "--base-model",
         default="microsoft/deberta-v3-small",
         help="Hugging Face base model checkpoint (e.g. microsoft/deberta-v3-small, microsoft/deberta-v3-base)",
@@ -45,28 +52,29 @@ def main():
 
     setup_logging()
     print("=" * 95)
-    print(f"SentinelJob AI — Full ML Pipeline Training (Mode: {args.model_type.upper()})")
+    print(f"SentinelJob AI — Full ML Pipeline Training (Mode: {args.model_type.upper()}, Dataset: {args.dataset_source.upper()})")
     print("=" * 95)
 
     # 1. Dataset Ingestion & Quality Cleaning
     print("\n1. Ingesting Production Dataset & Enforcing Multi-Tier Quality Safeguards:")
     print("-" * 95)
-    ingestion = ProductionDatasetIngestion()
-    df, stats = ingestion.ingest_and_clean()
+    if args.dataset_source == "multi":
+        df, stats = multi_dataset_ingestion.ingest_all(max_legit_samples=2500, max_fraud_samples=2500)
+        train_df, val_df, holdout_df = multi_dataset_ingestion.create_leakage_free_splits(df, random_state=42)
+    else:
+        ingestion = ProductionDatasetIngestion()
+        df, stats = ingestion.ingest_and_clean()
+        train_df, val_df, holdout_df = ingestion.create_leakage_free_splits(df, random_state=42)
 
     print(f"   * Total Raw Records Ingested   : {stats['total_raw_records']}")
     print(f"   * Exact Duplicates Dropped     : {stats['exact_duplicates_dropped']}")
-    print(f"   * Normalized Duplicates Dropped: {stats['normalized_duplicates_dropped']}")
-    print(f"   * Near-Duplicates Dropped      : {stats['near_duplicates_dropped']}")
     print(f"   * Clean Accepted Records       : {stats['accepted_records']}")
     print(f"   * Class Distribution           : {stats['class_distribution']} (0=Legitimate, 1=Fraud)")
     print(f"   * Distinct Documented Sources  : {stats['sources_count']}")
-    print(f"   * Vertical Categories          : {list(stats['category_distribution'].keys())}")
 
     # 2. Stratified Leakage-Free Splitting
     print("\n2. Creating Stratified Leakage-Free Partitions (70% Train / 15% Val / 15% Contemporary Holdout):")
     print("-" * 95)
-    train_df, val_df, holdout_df = ingestion.create_leakage_free_splits(df, random_state=42)
     print(f"   * Historical Training (70%)    : {len(train_df)} records")
     print(f"   * Validation Split (15%)       : {len(val_df)} records")
     print(f"   * Contemporary Holdout (15%)   : {len(holdout_df)} records")
@@ -78,8 +86,8 @@ def main():
 
     def lr_baseline_builder():
         return Pipeline([
-            ("tfidf", TfidfVectorizer(max_features=2500, ngram_range=(1, 2), sublinear_tf=True)),
-            ("clf", LogisticRegression(C=1.0, class_weight="balanced", random_state=42, max_iter=1000)),
+            ("tfidf", TfidfVectorizer(max_features=4000, ngram_range=(1, 2), sublinear_tf=True, stop_words="english")),
+            ("clf", LogisticRegression(C=1.2, class_weight="balanced", random_state=42, max_iter=1000)),
         ])
 
     cv_results = stats_evaluator.compute_stratified_cv(
@@ -119,7 +127,7 @@ def main():
         print(f"   * Transformer Val Recall        : {hf_meta['metrics']['val_recall']:.4f}")
 
     trainer = ModelTrainer(random_state=42)
-    eval_results = trainer.train_and_evaluate_all(train_df, val_df, holdout_df)
+    eval_results = trainer.train_and_evaluate_all(train_df, val_df, holdout_df, artifacts_dir="artifacts/models")
 
     header = f"{'Model Candidate':<42} | {'Acc':<6} | {'Prec':<6} | {'Rec':<6} | {'F1':<6} | {'ROC-AUC':<7} | {'Brier':<6} | {'ECE':<6}"
     print(header)
@@ -147,15 +155,21 @@ def main():
     baseline_info = eval_results["models"][baseline_name]
     baseline_hm = baseline_info["holdout_metrics"]
 
-    # Serialize Champion Candidate Artifact
+    # Serialize Both Baseline and Champion Candidate Artifacts
+    base_art_path, base_meta_path = trainer.serialize_candidate_artifact(
+        pipeline=baseline_info["pipeline_object"],
+        version="v1.0.0",
+        algorithm="Logistic_Regression",
+        metrics=baseline_hm,
+    )
     art_path, meta_path = trainer.serialize_candidate_artifact(
         pipeline=best_info["pipeline_object"],
         version="v2.0.0",
         algorithm="LinearSVM",
         metrics=best_hm,
     )
-    print(f"\n   * Model Artifact Saved: {art_path}")
-    print(f"   * Manifest Saved      : {meta_path}")
+    print(f"\n   * Baseline Model Saved: {base_art_path}")
+    print(f"   * Champion Model Saved: {art_path}")
 
     # 5. Bootstrap Confidence Intervals (95% CI) on Holdout
     print("\n5. Non-Parametric Bootstrap Confidence Intervals (B=1000, 95% CI):")

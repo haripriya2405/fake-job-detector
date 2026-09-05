@@ -27,6 +27,7 @@ import {
   GraduationCap,
   HelpCircle,
   Layers,
+  LogIn,
 } from 'lucide-react';
 import { DropZone } from '../components/upload/DropZone';
 import { LanguageSelector } from '../components/navigation/LanguageSelector';
@@ -204,6 +205,12 @@ export const AnalyzeJobPage = () => {
   const handleAnalyze = async (e) => {
     e.preventDefault();
 
+    if (!isAuthenticated && guestScanCount >= 1) {
+      error("You have already used your 1 free scan. Please sign in with Google or Email to unlock unlimited scans.");
+      setShowAuthModal(true);
+      return;
+    }
+
     if (activeTab === 'text') {
       if (!jobText.trim() || jobText.trim().length < 20) {
         error('Please enter at least 20 characters of job description content.');
@@ -283,7 +290,11 @@ export const AnalyzeJobPage = () => {
           company_name: companyName || undefined,
         });
       } else {
-        const fileType = selectedFile.type.includes('pdf') ? 'pdf' : 'image';
+        const isPdf = Boolean(
+          (selectedFile.type && selectedFile.type.includes('pdf')) ||
+          (selectedFile.name && selectedFile.name.toLowerCase().endsWith('.pdf'))
+        );
+        const fileType = isPdf ? 'pdf' : 'image';
         report = await analysisService.analyzeUpload(selectedFile, fileType, {
           job_title: jobTitle || selectedFile.name,
           company_name: companyName || undefined,
@@ -369,9 +380,23 @@ export const AnalyzeJobPage = () => {
             </span>
           </div>
 
-          {/* Quota Banner matching Page 6 */}
+          {/* Quota Banner */}
           <div className="rounded-xl bg-white/[0.03] border border-white/10 px-4 py-2.5 text-xs text-fog font-light">
-            1 free scan per device. <Link to="/register" className="text-emerald-400 underline underline-offset-2">Sign up for a free account</Link> to scan more and save your history.
+            {!isAuthenticated ? (
+              guestScanCount >= 1 ? (
+                <span className="text-amber-300">
+                  1 free scan used. <button type="button" onClick={() => setShowAuthModal(true)} className="text-emerald-400 underline underline-offset-2 font-medium">Sign in with Google or Email</button> to unlock unlimited scans & save history.
+                </span>
+              ) : (
+                <span>
+                  1 free scan per device. <button type="button" onClick={() => setShowAuthModal(true)} className="text-emerald-400 underline underline-offset-2 font-medium">Sign in</button> to unlock unlimited scans & history vault.
+                </span>
+              )
+            ) : (
+              <span className="text-emerald-400 font-mono text-[11px]">
+                ✓ Unlimited scans enabled for logged-in analyst account.
+              </span>
+            )}
           </div>
         </div>
 
@@ -406,8 +431,8 @@ export const AnalyzeJobPage = () => {
                         : 'text-fog hover:text-frost'
                     }`}
                   >
-                    <ImageIcon className="w-3.5 h-3.5" />
-                    <span>Upload Image</span>
+                    <Upload className="w-3.5 h-3.5" />
+                    <span>Upload PDF / Image</span>
                   </button>
 
                   <button
@@ -504,10 +529,10 @@ export const AnalyzeJobPage = () => {
                 </div>
               )}
 
-              {/* Tab 2: Upload Image */}
+              {/* Tab 2: Upload Document / Image */}
               {activeTab === 'image' && (
                 <DropZone
-                  acceptType="image"
+                  acceptType="both"
                   selectedFile={selectedFile}
                   onFileSelected={(file) => setSelectedFile(file)}
                   onRemoveFile={() => setSelectedFile(null)}
@@ -606,23 +631,34 @@ export const AnalyzeJobPage = () => {
 
               {/* Submit CTA */}
               <div className="space-y-2 pt-2">
-                <button
-                  type="submit"
-                  disabled={isAnalyzing}
-                  className="w-full flex items-center justify-center gap-2 py-3.5 px-6 rounded-xl bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 hover:from-emerald-400 hover:to-teal-400 text-black font-semibold text-sm shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 transition-all transform active:scale-[0.99] disabled:opacity-50 disabled:pointer-events-none"
-                >
-                  {isAnalyzing ? (
-                    <span className="flex items-center gap-2">
-                      <span className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
-                      <span>Analyzing Posting...</span>
-                    </span>
-                  ) : (
-                    <>
-                      <span>{activeTab === 'batch' ? 'Run Batch Threat Analysis' : 'Analyze Job Posting'}</span>
-                      <ArrowRight className="w-4 h-4" />
-                    </>
-                  )}
-                </button>
+                {!isAuthenticated && guestScanCount >= 1 ? (
+                  <button
+                    type="button"
+                    onClick={() => setShowAuthModal(true)}
+                    className="w-full flex items-center justify-center gap-2 py-3.5 px-6 rounded-xl bg-gradient-to-r from-amber-500 via-amber-600 to-amber-500 hover:from-amber-400 hover:to-amber-500 text-white font-semibold text-sm shadow-lg shadow-amber-500/25 transition-all transform active:scale-[0.99]"
+                  >
+                    <LogIn className="w-4 h-4" />
+                    <span>Sign In with Google or Email to Scan (1 Free Scan Used)</span>
+                  </button>
+                ) : (
+                  <button
+                    type="submit"
+                    disabled={isAnalyzing}
+                    className="w-full flex items-center justify-center gap-2 py-3.5 px-6 rounded-xl bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 hover:from-emerald-400 hover:to-teal-400 text-black font-semibold text-sm shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 transition-all transform active:scale-[0.99] disabled:opacity-50 disabled:pointer-events-none"
+                  >
+                    {isAnalyzing ? (
+                      <span className="flex items-center gap-2">
+                        <span className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
+                        <span>Analyzing Posting...</span>
+                      </span>
+                    ) : (
+                      <>
+                        <span>{activeTab === 'batch' ? 'Run Batch Threat Analysis' : 'Analyze Job Posting'}</span>
+                        <ArrowRight className="w-4 h-4" />
+                      </>
+                    )}
+                  </button>
+                )}
 
                 <p className="text-[11px] text-center text-fog font-light flex items-center justify-center gap-1.5">
                   <Lock className="w-3 h-3 text-emerald-400" />
@@ -965,3 +1001,5 @@ export const AnalyzeJobPage = () => {
     </div>
   );
 };
+
+export default AnalyzeJobPage;

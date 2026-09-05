@@ -107,7 +107,18 @@ RULE_REGISTRY: List[RuleDefinition] = [
         confidence=0.99,
         description="Candidate is instructed to deposit a mailed company check and purchase hardware from an authorized vendor.",
         recommendation="Do not deposit mailed checks. The check will bounce days later after you send real funds to the scam vendor.",
-        pattern=re.compile(r'\b(cashier check|company check will be mailed|deposit check|deposit (?:the|a) check (?:at|into)|keep \d+% commission and wire|vendor check)\b', re.IGNORECASE),
+        pattern=re.compile(r'\b(cashier check|company check|electronic check|deposit (?:via|at|into)?\s*(?:mobile\s*)?check|deposit (?:the|a) check|keep \d+%(?: commission)? and wire|vendor check|mobile check deposit)\b', re.IGNORECASE),
+    ),
+    RuleDefinition(
+        code="FIN_BITCOIN_ATM_DEPOSIT",
+        name="Crypto / Bitcoin ATM Cash Deposit Scam",
+        category="financial",
+        severity="critical",
+        default_weight=30,
+        confidence=0.99,
+        description="Candidate is instructed to deposit cash or company checks into a Bitcoin ATM or cryptocurrency kiosk.",
+        recommendation="Never use Bitcoin ATMs or send crypto for employment. This is an irreversible financial scam.",
+        pattern=re.compile(r'\b(bitcoin atm|coinstar|crypto kiosk|deposit at (?:the )?nearest bitcoin|qr code at bitcoin atm|metamask wallet|gas fee)\b', re.IGNORECASE),
     ),
     RuleDefinition(
         code="FIN_SEND_MONEY",
@@ -120,6 +131,17 @@ RULE_REGISTRY: List[RuleDefinition] = [
         recommendation="This is classic money mule recruitment. Receiving and routing unauthorized funds is illegal.",
         pattern=re.compile(r'\b(disburse company funds|forwarding funds|transfer to your personal bank|wire remainder|zelle to your personal|cashapp before laptop)\b', re.IGNORECASE),
     ),
+    RuleDefinition(
+        code="LOGISTICS_RESHIPPING_MULE",
+        name="Reshipping & Package Forwarding Mule",
+        category="logistics",
+        severity="critical",
+        default_weight=25,
+        confidence=0.95,
+        description="Candidate is instructed to receive, repackage, and forward merchandise/parcels to third parties.",
+        recommendation="Reshipping stolen merchandise from your residence is illegal and constitutes mail fraud.",
+        pattern=re.compile(r'\b(inspecting (?:luxury )?parcels|ship electronics and designer|repackage them with our prepaid|repackage and ship|forward packages|forwarded box)\b', re.IGNORECASE),
+    ),
 
     # -------------------------------------------------------------
     # Category B: Communication Channels (Max Category Cap: 10)
@@ -129,7 +151,7 @@ RULE_REGISTRY: List[RuleDefinition] = [
         name="Recruitment Directed Exclusively to Telegram",
         category="communication",
         severity="medium",
-        default_weight=10,
+        default_weight=15,
         confidence=0.90,
         description="Recruiter directs screening and interview exclusively to Telegram direct messaging or channels.",
         recommendation="Legitimate corporate HR departments conduct interviews via official video tools (Meet, Zoom, Teams) or official portals.",

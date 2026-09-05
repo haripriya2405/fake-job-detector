@@ -79,5 +79,29 @@
   - [x] JobScamScore Browser Extension (Manifest V3) for direct in-browser scanning on LinkedIn, Indeed, Glassdoor, and ATS job boards
   - [x] Frontend Batch Scanner Tab & Export triggers integrated in `AnalyzeJobPage.jsx`, `AnalysisResultPage.jsx`, and `AnalysisHistoryPage.jsx`
   - [x] Complete test suite passing: **213/213 tests passing (100% pass rate)**
+- [x] Phase 24: JobScamScore Match & Exceed Suite:
+  - [x] Feature 1: Public Community Scam Intelligence Database & Threat Feed (`/database` & `/scams`):
+    - [x] Backend `CommunityScam` ORM model, Pydantic schemas, and synchronous query service with PII regex anonymization
+    - [x] Pre-seeded threat corpus across Cashier Check scams, Telegram lures, Crypto task schemes, and Upfront fees
+    - [x] Paginated search, category filtering, threat confirmation upvoting, and scan report publishing API endpoints
+    - [x] Dark obsidian threat intelligence UI with live stats, search/sort filters, and interactive Forensic Dossier modal
+    - [x] Frontend API client service, top Navbar integration, and lazy route configuration
+    - [x] Automated test suite passing: `tests/test_community_scams.py` (7/7 passed)
+  - [x] Feature 2: Public Shareable Verification Certificate (`/verify/{id}`) & Verifiable Trust Badges:
+    - [x] Tamper-evident HMAC-SHA256 digital signature generator and validation engine in `app/services/certificate_service.py`
+    - [x] Canonical Certificate IDs (`JS-CERT-YYYY-XXXXXX`) and full content SHA-256 fingerprint generation
+    - [x] Dynamic vector SVG badge streaming endpoint (`GET /api/v1/verify/{id}/badge.svg`) with custom tier styling (Emerald / Amber / Crimson)
+    - [x] Luxury obsidian security audit certificate page (`frontend/src/pages/JobVerificationCertificatePage.jsx`)
+    - [x] Embed toolkit (Markdown / HTML snippet copy, LinkedIn share, print / PDF export) and direct link on `AnalysisResultPage.jsx`
+    - [x] Automated test suite passing: `tests/test_verification_certificate.py` (5/5 passed)
+  - [x] Feature 3: Frictionless Guest Quick-Scan on Homepage without mandatory login:
+    - [x] Unauthenticated guest real-time scan allowance with generous quota tracking in `HeroScannerCard.jsx`
+    - [x] `POST /api/v1/analysis/{id}/claim` endpoint to link anonymous guest scans with newly registered or logged-in accounts
+    - [x] Interactive guest banner with 1-click Google Sign-in / account claiming on `AnalysisResultPage.jsx`
+    - [x] Automated test suite passing: `tests/test_guest_scans_and_claiming.py` (3/3 passed)
+  - [ ] Feature 4: Recruiter Phone VoIP / Carrier Lookup & External Watchlist Feeds (FTC/BBB/IC3)
+  - [ ] Feature 5: "25 Job Scam Red Flags" Interactive Educational Hub & Scam Simulator Game
+  - [ ] Feature 6: Automated Threat Feed Syncing & Global Rate Limiting
+
 
 

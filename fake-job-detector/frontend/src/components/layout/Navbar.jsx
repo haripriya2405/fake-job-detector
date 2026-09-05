@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { ShieldCheck, User, LogOut, Menu, X, Shield } from 'lucide-react';
+import { ShieldCheck, User, LogOut, Menu, X, Shield, History } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { LanguageSelector } from '../navigation/LanguageSelector';
 import { TopAdvisoryBar } from '../navigation/TopAdvisoryBar';
@@ -43,10 +43,19 @@ export const Navbar = () => {
             <Link
               to="/analyze"
               className={`hover:text-frost transition-colors ${
-                isActive('/analyze') ? 'text-frost font-semibold' : ''
+                isActive('/analyze') || isActive('/scan') ? 'text-frost font-semibold' : ''
               }`}
             >
               Job Scam Checker
+            </Link>
+
+            <Link
+              to="/database"
+              className={`hover:text-frost transition-colors ${
+                isActive('/database') || isActive('/scams') ? 'text-frost font-semibold' : ''
+              }`}
+            >
+              Scam Database
             </Link>
 
             <Link
@@ -88,6 +97,14 @@ export const Navbar = () => {
                     >
                       <Shield className="w-3.5 h-3.5 text-emerald-400" />
                       Dashboard
+                    </Link>
+                    <Link
+                      to="/history"
+                      onClick={() => setUserDropdownOpen(false)}
+                      className="flex items-center gap-2 px-3 py-2 text-xs text-mist hover:text-frost hover:bg-white/5 rounded-xl"
+                    >
+                      <History className="w-3.5 h-3.5 text-emerald-400" />
+                      Scan History & Vault
                     </Link>
                     <Link
                       to="/settings"

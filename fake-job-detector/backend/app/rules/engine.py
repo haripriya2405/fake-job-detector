@@ -19,7 +19,7 @@ class RuleEngine:
         "compensation": 20,
         "manipulation": 15,
         "data_privacy": 15,
-        "communication": 10,
+        "communication": 15,
         "content_quality": 10,
     }
 

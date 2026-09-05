@@ -40,9 +40,12 @@ class MLPredictor:
         """Locate and load the verified model artifact and metadata."""
         if not self.artifact_path:
             if os.path.exists(self.artifacts_dir):
-                # Production Governance: Active production is logisticregression-v1.0.0 unless explicit path is provided
+                # Production Governance: Champion calibrated model is LinearSVM v2.0.0
+                svm_default = os.path.join(self.artifacts_dir, "tfidf_linearsvm_v2.0.0.joblib")
                 logreg_default = os.path.join(self.artifacts_dir, "tfidf_logistic_regression_v1.0.0.joblib")
-                if os.path.exists(logreg_default):
+                if os.path.exists(svm_default):
+                    self.artifact_path = svm_default
+                elif os.path.exists(logreg_default):
                     self.artifact_path = logreg_default
                 else:
                     joblib_candidates = [f for f in os.listdir(self.artifacts_dir) if f.endswith(".joblib")]
@@ -247,7 +250,7 @@ class MLPredictor:
         return features[:6], highlight_spans
 
     def _predict_sklearn(self, raw_text: str) -> MLPredictionOutput:
-        """Inference path for legacy scikit-learn models."""
+        """Inference path for scikit-learn models with highlighted spans."""
         cleaned = preprocessor.clean_text(raw_text)
         if not cleaned:
             return MLPredictionOutput(
@@ -257,6 +260,7 @@ class MLPredictor:
                 model_version=self.model_version,
                 algorithm=self.algorithm,
                 top_features=[],
+                highlight_spans=[],
             )
 
         if hasattr(self.model, "predict_proba"):
@@ -269,6 +273,14 @@ class MLPredictor:
         label = "suspicious" if prob_fraud >= 0.50 else "legitimate"
         confidence_scaled = round(prob_fraud * 100.0, 2)
         top_features = self._extract_top_features_sklearn(cleaned)
+        
+        # Extract linguistic highlight spans
+        manip_features, highlight_spans = self._extract_transformer_manipulation_spans(raw_text, prob_fraud)
+        if manip_features:
+            existing_tokens = {f.token.lower() for f in top_features}
+            for mf in manip_features:
+                if mf.token.lower() not in existing_tokens:
+                    top_features.insert(0, mf)
 
         return MLPredictionOutput(
             label=label,
@@ -276,7 +288,8 @@ class MLPredictor:
             confidence_score=confidence_scaled,
             model_version=f"{self.algorithm.lower()}-{self.model_version}",
             algorithm=self.algorithm,
-            top_features=top_features,
+            top_features=top_features[:8],
+            highlight_spans=highlight_spans,
             decision_threshold=0.50,
         )
 

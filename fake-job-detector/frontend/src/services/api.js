@@ -1,18 +1,29 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
+const getApiBaseUrl = () => {
+  const configured = import.meta.env.VITE_API_URL;
+  const is127 = typeof window !== 'undefined' && window.location.hostname === '127.0.0.1';
+  if (configured) {
+    if (is127) return configured.replace('localhost', '127.0.0.1');
+    return configured;
+  }
+  return is127 ? 'http://127.0.0.1:8000/api/v1' : 'http://localhost:8000/api/v1';
+};
+
+const API_BASE_URL = getApiBaseUrl();
 
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 30000, // 30s timeout to allow multi-modal and OCR extraction
+  timeout: 30000,
 });
 
-// Attach Authorization Bearer token to outgoing requests
+// Attach Authorization Bearer token & ensure dynamic hostname matching
 apiClient.interceptors.request.use(
   (config) => {
+    config.baseURL = getApiBaseUrl();
     const token = localStorage.getItem('sentinel_auth_token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;

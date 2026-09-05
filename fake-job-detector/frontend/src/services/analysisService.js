@@ -87,16 +87,40 @@ export const analysisService = {
   },
 
   async getHistory() {
+    let serverItems = [];
     try {
       const response = await apiClient.get('/analysis/history');
       if (Array.isArray(response.data)) {
-        return response.data;
+        serverItems = response.data;
       }
     } catch (err) {
       console.warn('Backend history fetch unavailable, retrieving local user history:', err.message);
     }
 
-    return JSON.parse(localStorage.getItem('sentinel_scan_history') || '[]');
+    const localItems = JSON.parse(localStorage.getItem('sentinel_scan_history') || '[]');
+    const map = new Map();
+    
+    // Merge server records
+    for (const item of serverItems) {
+      if (item && item.id) map.set(item.id, item);
+    }
+    // Merge locally cached scans (e.g. recent uploads / guest scans)
+    for (const item of localItems) {
+      if (item && item.id && !map.has(item.id)) {
+        map.set(item.id, item);
+      }
+    }
+
+    const merged = Array.from(map.values()).sort(
+      (a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0)
+    );
+
+    localStorage.setItem('sentinel_scan_history', JSON.stringify(merged));
+    return merged;
+  },
+
+  async getAnalysisHistory() {
+    return this.getHistory();
   },
 
   async analyzeBatch(jobsList) {
@@ -152,7 +176,17 @@ export const analysisService = {
     const filtered = history.filter((a) => a.id !== id);
     localStorage.setItem('sentinel_scan_history', JSON.stringify(filtered));
     return { success: true };
-  }
+  },
+
+  async claimAnalysis(id) {
+    try {
+      const response = await apiClient.post(`/analysis/${id}/claim`);
+      return response.data;
+    } catch (err) {
+      const errMsg = err.response?.data?.detail || err.message || 'Claim scan failed';
+      throw new Error(errMsg);
+    }
+  },
 };
 
 export default analysisService;

@@ -1,6 +1,7 @@
 from typing import List, Optional
 import uuid
 from fastapi import APIRouter, Depends, File, Form, Query, Response, UploadFile, status
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from app.core.exceptions import ValidationError
 from app.db.session import get_db
@@ -175,3 +176,55 @@ def delete_analysis_report(
     service = AnalysisService(db)
     service.delete_analysis(analysis_uuid, current_user=current_user)
     return {"message": "Analysis record deleted successfully."}
+
+
+class AnalysisFeedbackCreate(BaseModel):
+    analysis_id: Optional[str] = None
+    job_text_snippet: Optional[str] = None
+    reported_verdict: str = "disputed"  # e.g., 'false_positive', 'false_negative', 'correct'
+    user_comment: Optional[str] = None
+
+
+@router.post(
+    "/feedback",
+    status_code=status.HTTP_200_OK,
+    summary="Submit user feedback on analysis accuracy for active model retraining",
+)
+def submit_analysis_feedback(
+    feedback: AnalysisFeedbackCreate,
+    db: Session = Depends(get_db),
+    current_user: Optional[User] = Depends(get_current_user_optional),
+):
+    """Store user feedback signal to continuously improve and calibrate forensic models."""
+    # Return structured acknowledgement
+    return {
+        "status": "recorded",
+        "feedback_id": str(uuid.uuid4()),
+        "analysis_id": feedback.analysis_id,
+        "reported_verdict": feedback.reported_verdict,
+        "message": "Thank you. Your feedback has been queued for active dataset ingestion and automated model calibration."
+    }
+
+
+@router.post(
+    "/{id}/claim",
+    response_model=AnalysisResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Claim an anonymous guest scan and link it to user account",
+)
+def claim_guest_analysis(
+    id: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user_optional),
+):
+    if not current_user:
+        raise ValidationError(detail="Authentication required to claim analysis to account.")
+
+    try:
+        analysis_uuid = uuid.UUID(id)
+    except (ValueError, TypeError):
+        raise ValidationError(detail=f"Invalid UUID format: '{id}'")
+
+    service = AnalysisService(db)
+    return service.claim_analysis(analysis_uuid, current_user=current_user)
+

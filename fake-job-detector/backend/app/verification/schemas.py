@@ -40,6 +40,7 @@ class RecruiterEmailAnalysis(BaseModel):
     local_part: str
     email_domain: str
     is_free_webmail: bool = False
+    is_disposable_email: bool = False
     matches_company_domain: Optional[bool] = None
     matches_job_domain: Optional[bool] = None
 

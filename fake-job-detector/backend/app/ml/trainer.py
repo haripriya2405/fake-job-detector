@@ -70,19 +70,19 @@ class ModelTrainer:
 
         models_to_evaluate = {
             "logisticregression-v1.0.0 (Baseline)": Pipeline([
-                ("tfidf", TfidfVectorizer(max_features=2500, ngram_range=(1, 2), sublinear_tf=True)),
-                ("clf", LogisticRegression(C=1.0, class_weight="balanced", random_state=self.random_state, max_iter=1000)),
+                ("tfidf", TfidfVectorizer(max_features=4000, ngram_range=(1, 2), sublinear_tf=True, stop_words="english")),
+                ("clf", LogisticRegression(C=1.2, class_weight="balanced", random_state=self.random_state, max_iter=1000)),
             ]),
             "logisticregression-v2.0.0-candidate": Pipeline([
-                ("tfidf", TfidfVectorizer(max_features=3500, ngram_range=(1, 3), sublinear_tf=True, min_df=1)),
-                ("clf", LogisticRegression(C=1.5, class_weight="balanced", solver="lbfgs", random_state=self.random_state, max_iter=1000)),
+                ("tfidf", TfidfVectorizer(max_features=5000, ngram_range=(1, 2), sublinear_tf=True, min_df=1, stop_words="english")),
+                ("clf", LogisticRegression(C=1.8, class_weight="balanced", solver="lbfgs", random_state=self.random_state, max_iter=1000)),
             ]),
             "linearsvm-v2.0.0-candidate (Platt Scaled)": Pipeline([
-                ("tfidf", TfidfVectorizer(max_features=3500, ngram_range=(1, 2), sublinear_tf=True, min_df=1)),
+                ("tfidf", TfidfVectorizer(max_features=5000, ngram_range=(1, 2), sublinear_tf=True, min_df=1, stop_words="english")),
                 ("clf", CalibratedClassifierCV(
-                    estimator=LinearSVC(C=1.0, class_weight="balanced", random_state=self.random_state, max_iter=2000),
+                    estimator=LinearSVC(C=1.0, class_weight="balanced", random_state=self.random_state, max_iter=3000),
                     method="sigmoid",
-                    cv=2,
+                    cv=3,
                 )),
             ]),
         }

@@ -151,6 +151,50 @@ class UrlAnalysisCreate(BaseModel):
     company_name: Optional[str] = Field(None, max_length=255)
 
 
+# ---------------------------------------------------------------------------
+# Phase 24 Feature 4: Phone Carrier & Fraud Watchlist Schemas
+# ---------------------------------------------------------------------------
+
+class PhoneDetailSchema(BaseModel):
+    phone_number: str
+    area_code: Optional[str] = None
+    line_type: str = "MOBILE_CELLULAR"
+    carrier_name: str = "Standard Cellular Network"
+    is_voip: bool = False
+    risk_contribution: int = 0
+    risk_flags: List[str] = Field(default_factory=list)
+
+
+class PhoneIntelligenceSchema(BaseModel):
+    detected: bool = False
+    phone_count: int = 0
+    phones: List[PhoneDetailSchema] = Field(default_factory=list)
+    has_voip_burner: bool = False
+    risk_penalty: int = 0
+
+
+class WatchlistMatchSchema(BaseModel):
+    id: str
+    agency: str
+    agency_code: str
+    title: str
+    threat_type: str
+    summary: str
+    severity: str
+    matched_keywords: List[str] = Field(default_factory=list)
+    reference_url: str
+
+
+class FraudWatchlistSchema(BaseModel):
+    has_watchlist_matches: bool = False
+    status_verdict: str = "CLEAN_PASS"
+    match_count: int = 0
+    agencies_checked: List[str] = Field(default_factory=lambda: ["FTC", "BBB", "FBI_IC3"])
+    agencies_flagged: List[str] = Field(default_factory=list)
+    matches: List[WatchlistMatchSchema] = Field(default_factory=list)
+    risk_penalty: int = 0
+
+
 class AnalysisResponse(BaseModel):
     id: str
     job_title: Optional[str] = None
@@ -180,6 +224,10 @@ class AnalysisResponse(BaseModel):
     signals_8_layer: Optional[Signals8LayerSchema] = None
     red_flags: List[str] = Field(default_factory=list)
     green_flags: List[str] = Field(default_factory=list)
+
+    # Phase 24 Feature 4 Contact & Watchlist Intelligence
+    phone_intelligence: Optional[PhoneIntelligenceSchema] = None
+    fraud_watchlists: Optional[FraudWatchlistSchema] = None
 
     model_config = ConfigDict(from_attributes=True)
 

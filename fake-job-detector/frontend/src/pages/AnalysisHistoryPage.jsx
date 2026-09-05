@@ -40,44 +40,16 @@ export const AnalysisHistoryPage = () => {
     const fetchHistory = async () => {
       try {
         setLoading(true);
-        const data = await analysisService.getAnalysisHistory();
+        const data = await analysisService.getHistory();
         if (isMounted) {
-          if (data && data.length > 0) {
-            setHistory(data);
-          } else {
-            setHistory([
-              {
-                id: 'scan-001',
-                job_title: 'Full Stack Web Developer',
-                company_name: 'TechCorp Solutions India',
-                risk_score: 12,
-                risk_level: 'SAFE',
-                created_at: new Date(Date.now() - 3600000 * 2).toISOString(),
-                source_type: 'Text'
-              },
-              {
-                id: 'scan-002',
-                job_title: 'Remote Data Entry Clerk - $45/hr',
-                company_name: 'Global Ventures LLC (Unverified)',
-                risk_score: 88,
-                risk_level: 'HIGH_RISK',
-                created_at: new Date(Date.now() - 3600000 * 24).toISOString(),
-                source_type: 'URL'
-              },
-              {
-                id: 'scan-003',
-                job_title: 'Junior HR Assistant',
-                company_name: 'Apex Recruiting Partners',
-                risk_score: 45,
-                risk_level: 'MODERATE_RISK',
-                created_at: new Date(Date.now() - 3600000 * 48).toISOString(),
-                source_type: 'Screenshot'
-              }
-            ]);
-          }
+          setHistory(Array.isArray(data) ? data : []);
         }
       } catch (err) {
         console.error('Failed to load history:', err);
+        if (isMounted) {
+          const local = JSON.parse(localStorage.getItem('sentinel_scan_history') || '[]');
+          setHistory(local);
+        }
       } finally {
         if (isMounted) setLoading(false);
       }

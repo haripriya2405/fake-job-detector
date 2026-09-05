@@ -54,14 +54,16 @@ class DefaultAnalysisEngine(AnalysisEngine):
             "status": "completed",
             "ml_label": prediction.label,
             "ml_probability": prediction.probability,
+            "probability": prediction.probability,
             "ml_confidence": prediction.confidence_score,
             "model_version": prediction.model_version,
             "algorithm": prediction.algorithm,
             "top_features": [f.model_dump() for f in prediction.top_features],
+            "highlight_spans": prediction.highlight_spans,
             "decision_threshold": prediction.decision_threshold,
             "engine_notice": (
-                "ML statistical inference evaluated on TF-IDF word distribution. "
-                "Raw probability must be combined with deterministic rules and domain verification by RiskEngine."
+                "ML statistical inference evaluated on calibrated NLP distribution. "
+                "Raw probability is synthesized with deterministic security rules and domain verification."
             ),
         }
 

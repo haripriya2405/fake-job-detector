@@ -9,12 +9,17 @@ import {
 import { analysisService } from '../services/analysisService';
 import { LoadingSpinner } from '../components/ui/LoadingSpinner';
 import { useToast } from '../hooks/useToast';
+import { useAuth } from '../context/AuthContext';
+import { GoogleAuthModal } from '../components/auth/GoogleAuthModal';
 
 export const AnalysisResultPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { addToast } = useToast();
+  const { addToast, success, error: toastError } = useToast();
+  const { isAuthenticated } = useAuth();
 
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [isClaiming, setIsClaiming] = useState(false);
   const [loading, setLoading] = useState(true);
   const [report, setReport] = useState(null);
   const [error, setError] = useState(null);
@@ -181,9 +186,51 @@ export const AnalysisResultPage = () => {
   const isSafe = score < 30;
   const isModerate = score >= 30 && score < 70;
 
+  const handleClaimSuccess = async () => {
+    if (!report?.id || report.id === 'demo') return;
+    try {
+      setIsClaiming(true);
+      await analysisService.claimAnalysis(report.id);
+      success('Scan successfully claimed and saved to your permanent audit history!');
+    } catch (err) {
+      console.warn('Could not auto-claim scan:', err);
+    } finally {
+      setIsClaiming(false);
+    }
+  };
+
   return (
     <div className="max-w-5xl mx-auto space-y-6 py-2 select-none">
       
+      {/* Guest Free Scan Notice Banner */}
+      {!isAuthenticated && (
+        <div className="bg-gradient-to-r from-cyan-950/80 via-slate-900 to-indigo-950/80 border border-cyan-500/30 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl">
+          <div className="flex items-center gap-3.5">
+            <div className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 shrink-0">
+              <Sparkles className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="text-sm font-bold text-white flex items-center gap-2">
+                Free Guest Scan Preview
+                <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 font-semibold">
+                  Unsaved Session
+                </span>
+              </div>
+              <div className="text-xs text-slate-300 mt-0.5 leading-relaxed">
+                Save this forensic audit to your free permanent account to track employer responses, view historical scans, and export verified evidence dossiers.
+              </div>
+            </div>
+          </div>
+          <button
+            onClick={() => setShowAuthModal(true)}
+            className="px-4 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-semibold whitespace-nowrap shadow-md transition-all flex items-center gap-1.5 shrink-0"
+          >
+            <ShieldCheck className="w-4 h-4" />
+            Save to Free Account
+          </button>
+        </div>
+      )}
+
       {/* Top Header Control Bar */}
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 pb-4">
         <div className="flex items-center gap-3">
@@ -208,6 +255,13 @@ export const AnalysisResultPage = () => {
           >
             Collapse all
           </button>
+          <Link
+            to={`/verify/${report.id}`}
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/40 text-xs font-semibold text-cyan-300 transition-colors shadow-sm"
+          >
+            <ShieldCheck className="w-3.5 h-3.5" />
+            <span>Audit Certificate</span>
+          </Link>
           <button
             onClick={handleShare}
             className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 text-xs font-medium text-emerald-300 transition-colors"
@@ -412,24 +466,106 @@ export const AnalysisResultPage = () => {
           )}
         </div>
 
-        {/* CARD 5: Contact Verification */}
+        {/* CARD 5: Contact Verification & Fraud Watchlists */}
         <div className="glass-card rounded-2xl border border-white/10 overflow-hidden shadow-lg">
           <button onClick={() => toggleCard(5)} type="button" className="w-full p-5 bg-white/[0.02] hover:bg-white/[0.05] flex items-center justify-between text-left">
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-xs">5</div>
               <div>
-                <h3 className="text-base font-bold text-white">Contact Verification</h3>
-                <p className="text-xs text-slate-400 font-light">Email domain, phone, and channel matching</p>
+                <h3 className="text-base font-bold text-white">Contact & Fraud Watchlist Intelligence</h3>
+                <p className="text-xs text-slate-400 font-light">Phone carrier line type, VoIP burner detection, FTC, BBB & FBI IC3 matching</p>
               </div>
             </div>
             {expandedCards[5] ? <ChevronUp className="w-5 h-5 text-slate-400" /> : <ChevronDown className="w-5 h-5 text-slate-400" />}
           </button>
           {expandedCards[5] && (
             <div className="p-6 border-t border-white/10 bg-black/40 space-y-4 text-xs">
+              
+              {/* Official Contact Domain */}
               <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 font-semibold flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>{report.contact_verification?.status_text || 'Official contact domain matches listing domain'}</span>
+                <span>{report.contact_verification?.status_text || 'Official contact domain verified.'}</span>
               </div>
+
+              {/* Phone Carrier & VoIP Intelligence */}
+              {report.phone_intelligence?.detected && (
+                <div className="p-4 rounded-xl bg-white/[0.03] border border-white/10 space-y-2.5">
+                  <div className="flex items-center justify-between">
+                    <span className="font-semibold text-white flex items-center gap-1.5">
+                      <Mail className="w-3.5 h-3.5 text-cyan-400" />
+                      Recruiter Phone Line Classification
+                    </span>
+                    <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase ${
+                      report.phone_intelligence.has_voip_burner
+                        ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
+                        : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+                    }`}>
+                      {report.phone_intelligence.has_voip_burner ? 'VoIP Burner Detected' : 'Standard Carrier Verified'}
+                    </span>
+                  </div>
+
+                  <div className="space-y-1.5 pt-1">
+                    {report.phone_intelligence.phones.map((p, idx) => (
+                      <div key={idx} className="flex flex-wrap items-center justify-between p-2.5 rounded-lg bg-black/40 border border-white/5 text-[11px] gap-2">
+                        <span className="font-mono text-cyan-300">{p.phone_number}</span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-slate-400">Carrier: <strong className="text-slate-200">{p.carrier_name}</strong></span>
+                          <span className={`px-2 py-0.5 rounded text-[10px] font-semibold ${
+                            p.is_voip ? 'bg-amber-500/15 text-amber-300' : 'bg-white/5 text-slate-300'
+                          }`}>
+                            {p.line_type}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Fraud Watchlist Cross-Reference (FTC, BBB, FBI IC3) */}
+              {report.fraud_watchlists && (
+                <div className="p-4 rounded-xl bg-white/[0.03] border border-white/10 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="font-semibold text-white flex items-center gap-1.5">
+                      <ShieldAlert className="w-3.5 h-3.5 text-red-400" />
+                      External Fraud Watchlists (FTC &middot; BBB &middot; FBI IC3)
+                    </span>
+                    <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase ${
+                      report.fraud_watchlists.has_watchlist_matches
+                        ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
+                        : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+                    }`}>
+                      {report.fraud_watchlists.has_watchlist_matches ? `${report.fraud_watchlists.match_count} Watchlist Alerts Found` : 'Clean Pass (0 Matches)'}
+                    </span>
+                  </div>
+
+                  {report.fraud_watchlists.has_watchlist_matches ? (
+                    <div className="space-y-2 pt-1">
+                      {report.fraud_watchlists.matches.map((m, idx) => (
+                        <div key={idx} className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-200 space-y-1">
+                          <div className="flex items-center justify-between">
+                            <span className="font-bold text-rose-300">{m.agency}: {m.title}</span>
+                            <a
+                              href={m.reference_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1 text-[10px] text-cyan-300 hover:underline"
+                            >
+                              Official Advisory <ExternalLink className="w-3 h-3" />
+                            </a>
+                          </div>
+                          <p className="text-[11px] text-slate-300 leading-relaxed font-sans">{m.summary}</p>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-[11px] text-slate-400">
+                      No active recruitment fraud warnings or impersonator complaints found on FTC Consumer Alerts, BBB Scam Tracker, or FBI IC3 databases.
+                    </p>
+                  )}
+                </div>
+              )}
+
             </div>
           )}
         </div>
@@ -596,6 +732,13 @@ export const AnalysisResultPage = () => {
         </div>
 
       </div>
+
+      {/* 1-Click Guest Save / Auth Modal */}
+      <GoogleAuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        onSuccess={handleClaimSuccess}
+      />
     </div>
   );
 };

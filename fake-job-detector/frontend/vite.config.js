@@ -6,6 +6,7 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 3000,
+    strictPort: true, //Guarantees it always uses 3000 and never shifts to 3001
     open: false,
   },
   build: {

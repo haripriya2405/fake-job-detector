@@ -8,6 +8,8 @@ from app.models.model_version import ModelVersion
 from app.models.rule_version import RuleVersion
 from app.models.audit_log import AuditLog
 
+from app.models.community_scam import CommunityScam
+
 __all__ = [
     "Base",
     "GUID",
@@ -20,4 +22,5 @@ __all__ = [
     "ModelVersion",
     "RuleVersion",
     "AuditLog",
+    "CommunityScam",
 ]

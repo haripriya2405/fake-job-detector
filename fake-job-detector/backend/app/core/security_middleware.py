@@ -75,7 +75,7 @@ class InMemoryRateLimiterMiddleware(BaseHTTPMiddleware):
         cls._shared_requests.clear()
 
     async def dispatch(self, request: Request, call_next):
-        if not settings.RATE_LIMIT_ENABLED:
+        if not settings.RATE_LIMIT_ENABLED or request.method == "OPTIONS":
             return await call_next(request)
 
         path = request.url.path

@@ -1,4 +1,4 @@
-﻿import React, { Suspense, lazy } from 'react';
+import React, { Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
@@ -11,6 +11,8 @@ const LoginPage = lazy(() => import('./pages/LoginPage'));
 const RegisterPage = lazy(() => import('./pages/RegisterPage'));
 const RedFlagsGuidePage = lazy(() => import('./pages/RedFlagsGuidePage'));
 const LiveScamAlertsPage = lazy(() => import('./pages/LiveScamAlertsPage'));
+const CommunityScamDatabasePage = lazy(() => import('./pages/CommunityScamDatabasePage'));
+const JobVerificationCertificatePage = lazy(() => import('./pages/JobVerificationCertificatePage'));
 const DashboardPage = lazy(() => import('./pages/DashboardPage'));
 const AnalyzeJobPage = lazy(() => import('./pages/AnalyzeJobPage'));
 const AnalysisResultPage = lazy(() => import('./pages/AnalysisResultPage'));
@@ -38,7 +40,13 @@ export function App() {
                 <Route path="/" element={<LandingPage />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />
+                <Route path="/database" element={<CommunityScamDatabasePage />} />
+                <Route path="/scams" element={<CommunityScamDatabasePage />} />
+                <Route path="/verify/:id" element={<JobVerificationCertificatePage />} />
+                <Route path="/certificate/:id" element={<JobVerificationCertificatePage />} />
                 <Route path="/guides/job-scam-red-flags" element={<RedFlagsGuidePage />} />
+                <Route path="/simulator" element={<RedFlagsGuidePage />} />
+                <Route path="/game" element={<RedFlagsGuidePage />} />
                 <Route path="/alerts" element={<LiveScamAlertsPage />} />
                 <Route path="/live-alerts" element={<LiveScamAlertsPage />} />
               </Route>

@@ -19,6 +19,34 @@ FREE_MAIL_PROVIDERS = {
     "zoho.com", "icloud.com", "aol.com",
 }
 
+def _load_disposable_domains() -> set:
+    import os
+    domains = {"mailinator.com", "guerrillamail.com", "tempmail.com", "10minutemail.com", "trashmail.com"}
+    data_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "data")
+    list_path = os.path.join(data_dir, "disposable_email_blocklist.conf.txt")
+    if not os.path.exists(list_path):
+        list_path = os.path.join(data_dir, "disposable_email_blocklist.conf")
+    if os.path.exists(list_path):
+        try:
+            with open(list_path, "r", encoding="utf-8", errors="ignore") as f:
+                for line in f:
+                    dom = line.strip().lower()
+                    if dom and not dom.startswith("#"):
+                        domains.add(dom)
+        except Exception:
+            pass
+    return domains
+
+DISPOSABLE_EMAIL_PROVIDERS = _load_disposable_domains()
+
+KNOWN_ENTERPRISE_ATS_DOMAINS = {
+    "greenhouse.io", "lever.co", "myworkdayjobs.com", "workday.com",
+    "smartrecruiters.com", "ashbyhq.com", "taleo.net", "bamboohr.com",
+    "workable.com", "icims.com", "jobvite.com", "successfactors.com",
+    "jazzhr.com", "rippling.com", "breezy.hr", "recruitee.com",
+    "workdayjobs.com", "pinpointhq.com", "join.com"
+}
+
 EMAIL_REGEX = re.compile(
     r'\b([A-Za-z0-9._%+-]+)@([A-Za-z0-9.-]+\.[A-Za-z]{2,12})\b',
     re.IGNORECASE,
@@ -27,20 +55,23 @@ EMAIL_REGEX = re.compile(
 
 class VerificationService:
     """Multi-layer Domain, Email, and Company Consistency Verification Service.
-    Uses RDAP, DNS resolution, MX validation, and recruiter email cross-referencing.
+    Uses RDAP, DNS resolution, MX validation, ATS identification, and recruiter email cross-referencing.
     """
 
-    VERSION = "verification-v1.0.0"
+    VERSION = "verification-v2.0.0"
 
     # Configurable Signal Weights (Max Domain Penalty Cap: 35)
     SIGNAL_WEIGHTS = {
+        "LOOKALIKE_BRAND_DOMAIN": 25,
         "DOMAIN_NOT_RESOLVING": 15,
         "DOMAIN_RECENT_REGISTRATION": 10,
         "EMAIL_DOMAIN_MISMATCH": 10,
-        "EMAIL_FREE_WEBMAIL": 6,
+        "EMAIL_DISPOSABLE_PROVIDER": 20,
+        "EMAIL_FREE_WEBMAIL": 8,
         "DOMAIN_NO_MX": 5,
         "COMPANY_DOMAIN_INCONSISTENCY": 14,
-        "DOMAIN_REGISTRATION_UNAVAILABLE": 4,
+        "DOMAIN_REGISTRATION_UNAVAILABLE": 3,
+        "ATS_PORTAL_VERIFIED": -10,  # Negative weight reduces risk
     }
     MAX_DOMAIN_PENALTY: int = 35
 
@@ -117,12 +148,14 @@ class VerificationService:
                 seen_emails.add(email_clean)
                 dom_clean = domain.lower()
                 is_free = dom_clean in FREE_MAIL_PROVIDERS
+                is_disposable = dom_clean in DISPOSABLE_EMAIL_PROVIDERS
                 results.append(
                     RecruiterEmailAnalysis(
                         email=email_clean,
                         local_part=local.lower(),
                         email_domain=dom_clean,
                         is_free_webmail=is_free,
+                        is_disposable_email=is_disposable,
                     )
                 )
         return results
@@ -155,8 +188,16 @@ class VerificationService:
         first_email = emails[0] if emails else None
         email_match = None
 
+        has_verified_ats = any(
+            any(ats in d.hostname or ats in d.registrable_domain for ats in KNOWN_ENTERPRISE_ATS_DOMAINS)
+            for d in extracted_domains
+        )
+
         if claimed_company:
             notes.append(f"Claimed company: '{claimed_company}'")
+
+        if has_verified_ats:
+            notes.append("Application hosted on verified Enterprise Applicant Tracking System (ATS)")
 
         if first_email and primary_domain_str:
             email_domain = get_registrable_domain(first_email.email_domain)
@@ -175,7 +216,9 @@ class VerificationService:
                 notes.append(f"Recruiter email domain '{first_email.email_domain}' does not match job domain '{primary_domain_str}'")
 
         # Determine verification tier
-        if extracted_domains and extracted_domains[0].dns.resolves:
+        if has_verified_ats:
+            status = "verified"
+        elif extracted_domains and extracted_domains[0].dns.resolves:
             if extracted_domains[0].rdap.domain_age_days and extracted_domains[0].rdap.domain_age_days > 365 and email_match:
                 status = "verified"
             elif email_match is False and not first_email.is_free_webmail:
@@ -208,6 +251,39 @@ class VerificationService:
         raw_penalty = 0
 
         for d in domain_results:
+            # Check Enterprise ATS
+            is_ats = any(ats in d.hostname or ats in d.registrable_domain for ats in KNOWN_ENTERPRISE_ATS_DOMAINS)
+            if is_ats:
+                signals.append(VerificationSignal(
+                    signal_code="ATS_PORTAL_VERIFIED",
+                    name="Verified Enterprise ATS Portal",
+                    severity="advisory",
+                    weight=self.SIGNAL_WEIGHTS["ATS_PORTAL_VERIFIED"],
+                    description=f"Job application is routed through verified Enterprise ATS infrastructure ({d.registrable_domain}).",
+                    evidence=f"ATS Host: {d.hostname}",
+                ))
+                raw_penalty += self.SIGNAL_WEIGHTS["ATS_PORTAL_VERIFIED"]
+                continue
+
+            # Check Brand Lookalike / Typosquatting
+            if company_result.claimed_name:
+                c_clean = re.sub(r'[^a-zA-Z0-9]', '', company_result.claimed_name.lower())
+                d_clean = d.registrable_domain.lower()
+                if len(c_clean) >= 4 and c_clean in d_clean:
+                    # e.g., 'google' in 'google-careers-portal.com' vs 'google.com'
+                    official_domain = f"{c_clean}.com"
+                    if d.registrable_domain != official_domain and ("-" in d_clean or any(tld in d_clean for tld in [".xyz", ".top", ".info", ".online", ".site"])):
+                        w = self.SIGNAL_WEIGHTS["LOOKALIKE_BRAND_DOMAIN"]
+                        signals.append(VerificationSignal(
+                            signal_code="LOOKALIKE_BRAND_DOMAIN",
+                            name="Potential Brand Lookalike / Phishing Domain",
+                            severity="high",
+                            weight=w,
+                            description=f"Domain '{d.registrable_domain}' contains brand name '{company_result.claimed_name}' with suspicious structure/TLD.",
+                            evidence=f"Claimed Brand: {company_result.claimed_name}, Domain: {d.registrable_domain}",
+                        ))
+                        raw_penalty += w
+
             # 1. Check DNS resolution
             if not d.dns.resolves:
                 w = self.SIGNAL_WEIGHTS["DOMAIN_NOT_RESOLVING"]
@@ -247,7 +323,7 @@ class VerificationService:
                 ))
                 raw_penalty += w
             elif d.rdap.status == "unavailable" and d.dns.resolves:
-                # Registration data unavailable (e.g. privacy or unsupported TLD)
+                # Registration data unavailable
                 signals.append(VerificationSignal(
                     signal_code="DOMAIN_REGISTRATION_UNAVAILABLE",
                     name="Registration Data Redacted / Unavailable",
@@ -259,7 +335,18 @@ class VerificationService:
 
         # 4. Check Email Domain Consistency
         for email in emails:
-            if email.matches_job_domain is False and not email.is_free_webmail:
+            if email.is_disposable_email:
+                w = self.SIGNAL_WEIGHTS["EMAIL_DISPOSABLE_PROVIDER"]
+                signals.append(VerificationSignal(
+                    signal_code="EMAIL_DISPOSABLE_PROVIDER",
+                    name="Disposable / Burner Recruiter Email Provider",
+                    severity="high",
+                    weight=w,
+                    description=f"Recruiter uses temporary burner/disposable email provider (@{email.email_domain}).",
+                    evidence=f"Disposable Email: {email.email}",
+                ))
+                raw_penalty += w
+            elif email.matches_job_domain is False and not email.is_free_webmail:
                 w = self.SIGNAL_WEIGHTS["EMAIL_DOMAIN_MISMATCH"]
                 signals.append(VerificationSignal(
                     signal_code="EMAIL_DOMAIN_MISMATCH",
@@ -295,8 +382,8 @@ class VerificationService:
             ))
             raw_penalty += w
 
-        # Capped domain penalty score
-        capped_penalty = min(raw_penalty, self.MAX_DOMAIN_PENALTY)
+        # Capped domain penalty score (can be 0 or capped at max)
+        capped_penalty = max(0, min(raw_penalty, self.MAX_DOMAIN_PENALTY))
         return signals, capped_penalty
 
     def _compute_confidence(
