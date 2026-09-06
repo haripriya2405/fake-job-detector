@@ -1,5 +1,5 @@
-// JobScamScore Browser Extension - Content Script
-// Extracts job details from active web pages (LinkedIn, Indeed, Glassdoor, Greenhouse, Lever, Workday)
+// SentinelJob AI Browser Extension - Content Script
+// Extracts job details across LinkedIn, Indeed, Glassdoor, ZipRecruiter, Handshake, Greenhouse, Lever, Workday, Dice
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'GET_JOB_DETAILS') {
@@ -28,7 +28,7 @@ function extractJobDataFromDOM() {
 
     title = titleEl ? titleEl.innerText.trim() : '';
     company = companyEl ? companyEl.innerText.trim() : '';
-    text = descEl ? descEl.innerText.trim() : document.body.innerText.slice(0, 5000);
+    text = descEl ? descEl.innerText.trim() : document.body.innerText.slice(0, 6000);
   }
   // 2. Indeed Job Details
   else if (host.includes('indeed.com')) {
@@ -41,9 +41,39 @@ function extractJobDataFromDOM() {
 
     title = titleEl ? titleEl.innerText.trim() : '';
     company = companyEl ? companyEl.innerText.trim() : '';
-    text = descEl ? descEl.innerText.trim() : document.body.innerText.slice(0, 5000);
+    text = descEl ? descEl.innerText.trim() : document.body.innerText.slice(0, 6000);
   }
-  // 3. Greenhouse ATS
+  // 3. ZipRecruiter
+  else if (host.includes('ziprecruiter.com')) {
+    const titleEl = document.querySelector('.job_title') || document.querySelector('h1');
+    const companyEl = document.querySelector('.hiring_company_text') || document.querySelector('.company_name');
+    const descEl = document.querySelector('.jobDescriptionSection') || document.querySelector('.job_description');
+
+    title = titleEl ? titleEl.innerText.trim() : '';
+    company = companyEl ? companyEl.innerText.trim() : '';
+    text = descEl ? descEl.innerText.trim() : document.body.innerText.slice(0, 6000);
+  }
+  // 4. Glassdoor
+  else if (host.includes('glassdoor.com')) {
+    const titleEl = document.querySelector('[data-test="job-title"]') || document.querySelector('h1');
+    const companyEl = document.querySelector('[data-test="employer-name"]') || document.querySelector('.EmployerProfile_employerName');
+    const descEl = document.querySelector('.JobDetails_jobDescription') || document.querySelector('#JobDescriptionContainer');
+
+    title = titleEl ? titleEl.innerText.trim() : '';
+    company = companyEl ? companyEl.innerText.trim() : '';
+    text = descEl ? descEl.innerText.trim() : document.body.innerText.slice(0, 6000);
+  }
+  // 5. Handshake
+  else if (host.includes('joinhandshake.com')) {
+    const titleEl = document.querySelector('[data-hook="job-title"]') || document.querySelector('h1');
+    const companyEl = document.querySelector('[data-hook="employer-name"]');
+    const descEl = document.querySelector('[data-hook="job-description"]') || document.querySelector('.style__description');
+
+    title = titleEl ? titleEl.innerText.trim() : '';
+    company = companyEl ? companyEl.innerText.trim() : '';
+    text = descEl ? descEl.innerText.trim() : document.body.innerText.slice(0, 6000);
+  }
+  // 6. Greenhouse ATS
   else if (host.includes('greenhouse.io')) {
     const titleEl = document.querySelector('.app-title') || document.querySelector('h1');
     const companyEl = document.querySelector('.company-name') || document.querySelector('.header__logo-text');
@@ -51,9 +81,9 @@ function extractJobDataFromDOM() {
 
     title = titleEl ? titleEl.innerText.trim() : '';
     company = companyEl ? companyEl.innerText.trim() : '';
-    text = descEl ? descEl.innerText.trim() : document.body.innerText.slice(0, 5000);
+    text = descEl ? descEl.innerText.trim() : document.body.innerText.slice(0, 6000);
   }
-  // 4. Lever ATS
+  // 7. Lever ATS
   else if (host.includes('lever.co')) {
     const titleEl = document.querySelector('.posting-headline h2') || document.querySelector('h2');
     const companyEl = document.querySelector('.main-header-logo img') || document.querySelector('.posting-headline');
@@ -61,19 +91,19 @@ function extractJobDataFromDOM() {
 
     title = titleEl ? titleEl.innerText.trim() : '';
     company = companyEl ? (companyEl.getAttribute('alt') || '') : '';
-    text = descEl ? descEl.innerText.trim() : document.body.innerText.slice(0, 5000);
+    text = descEl ? descEl.innerText.trim() : document.body.innerText.slice(0, 6000);
   }
-  // 5. General / Workday / Other Fallback
+  // 8. General / Fallback
   else {
     const h1 = document.querySelector('h1');
     title = h1 ? h1.innerText.trim() : document.title;
-    text = document.body ? document.body.innerText.slice(0, 5000) : '';
+    text = document.body ? document.body.innerText.slice(0, 6000) : '';
   }
 
   return {
     title: title || document.title || 'Job Listing',
     company: company || 'Employer',
-    text: text || document.body?.innerText?.slice(0, 3000) || '',
+    text: text || document.body?.innerText?.slice(0, 4000) || '',
     url: window.location.href
   };
 }

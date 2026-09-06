@@ -39,7 +39,7 @@ export const Navbar = () => {
           </Link>
 
           {/* Center Navigation Links matching reference */}
-          <div className="hidden md:flex items-center gap-8 text-sm font-medium text-fog">
+          <div className="hidden md:flex items-center gap-7 text-sm font-medium text-fog">
             <Link
               to="/analyze"
               className={`hover:text-frost transition-colors ${
@@ -65,6 +65,18 @@ export const Navbar = () => {
               }`}
             >
               Red Flags Guide
+            </Link>
+
+            <Link
+              to="/simulator"
+              className={`flex items-center gap-1.5 hover:text-frost transition-colors ${
+                isActive('/simulator') || isActive('/game') ? 'text-frost font-semibold' : ''
+              }`}
+            >
+              <span>Scam Simulator</span>
+              <span className="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-bold border border-emerald-500/30">
+                Game
+              </span>
             </Link>
           </div>
 
@@ -176,11 +188,25 @@ export const Navbar = () => {
                 Job Scam Checker
               </Link>
               <Link
+                to="/database"
+                onClick={() => setMobileMenuOpen(false)}
+                className="px-3 py-2 rounded-xl text-xs text-mist hover:text-frost hover:bg-white/5"
+              >
+                Scam Database
+              </Link>
+              <Link
                 to="/guides/job-scam-red-flags"
                 onClick={() => setMobileMenuOpen(false)}
                 className="px-3 py-2 rounded-xl text-xs text-mist hover:text-frost hover:bg-white/5"
               >
                 Red Flags Guide
+              </Link>
+              <Link
+                to="/simulator"
+                onClick={() => setMobileMenuOpen(false)}
+                className="px-3 py-2 rounded-xl text-xs text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10 font-semibold"
+              >
+                🎮 Scam Hunter Simulator
               </Link>
               <Link
                 to="/dashboard"

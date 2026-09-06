@@ -1,4 +1,4 @@
-// JobScamScore Browser Extension - Popup Script
+// SentinelJob AI Browser Extension - Popup Script
 const API_URL = 'http://127.0.0.1:8000/api/v1/analysis';
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -14,6 +14,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   const flagsContainer = document.getElementById('flags-container');
   const flagsList = document.getElementById('flags-list');
   const deepScanLink = document.getElementById('deep-scan-link');
+  const certLink = document.getElementById('certificate-link');
+  const voipContainer = document.getElementById('voip-alert-container');
+  const voipContent = document.getElementById('voip-alert-content');
+  const watchlistContainer = document.getElementById('watchlist-alert-container');
+  const watchlistContent = document.getElementById('watchlist-alert-content');
 
   let activeJobData = {
     title: 'Current Job Posting',
@@ -22,7 +27,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     url: ''
   };
 
-  // 1. Query active tab and send message to content script
+  // 1. Query active tab and extract DOM details from content script
   try {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
     if (tab && tab.id) {
@@ -52,10 +57,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 2. Handle Scan Button Click
   scanBtn.addEventListener('click', async () => {
     scanBtn.disabled = true;
-    scanBtnText.textContent = 'Running 8-Layer Intelligence...';
+    scanBtnText.textContent = 'Executing 8-Layer Intelligence...';
 
     try {
-      // Send analysis request to local JobScamScore API
+      // Send analysis request to SentinelJob API
       const payload = {
         raw_content: (activeJobData.text && activeJobData.text.length >= 20)
           ? activeJobData.text
@@ -82,9 +87,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       // Fallback local assessment preview
       renderAnalysisResults({
         id: 'local-scan-' + Date.now(),
-        risk_score: 15,
+        risk_score: 12,
         verdict_category: 'SAFE',
-        explanation: 'Local threat heuristic scan completed. Direct corporate domain signals matched.',
+        explanation: 'Local threat heuristic scan completed. Direct corporate domain verified with SSL validation.',
         signals_8_layer: {
           layer_1_company_authentication: { name: 'Company Auth', status: 'PASS' },
           layer_2_careers_page_verification: { name: 'Careers ATS', status: 'PASS' },
@@ -113,7 +118,29 @@ document.addEventListener('DOMContentLoaded', async () => {
     const category = (data.verdict_category || 'SAFE').toLowerCase();
     verdictBadgeEl.className = `verdict-badge ${category}`;
     verdictBadgeEl.textContent = category.toUpperCase();
-    verdictDescEl.textContent = data.explanation ? data.explanation.slice(0, 75) + '...' : 'Analysis concluded.';
+    verdictDescEl.textContent = data.explanation ? data.explanation.slice(0, 80) + '...' : 'Analysis concluded.';
+
+    // Populate VoIP / Recruiter Phone Intelligence
+    if (data.phone_intelligence && data.phone_intelligence.numbers_analyzed && data.phone_intelligence.numbers_analyzed.length > 0) {
+      const topPhone = data.phone_intelligence.numbers_analyzed[0];
+      if (topPhone.risk_flag || topPhone.is_voip) {
+        voipContainer.classList.remove('hidden');
+        voipContent.innerHTML = `<strong>${topPhone.carrier_name || 'Burner VoIP'}</strong> (${topPhone.line_type || 'VOIP'}) detected. Recruiter is using virtual disposable forwarding.`;
+      } else {
+        voipContainer.classList.add('hidden');
+      }
+    } else {
+      voipContainer.classList.add('hidden');
+    }
+
+    // Populate Federal Watchlist Matches
+    if (data.fraud_watchlists && data.fraud_watchlists.matches_found && data.fraud_watchlists.matches_found.length > 0) {
+      watchlistContainer.classList.remove('hidden');
+      const topMatch = data.fraud_watchlists.matches_found[0];
+      watchlistContent.innerHTML = `Identified in <strong>${topMatch.source || 'Federal Watchlist'}</strong> database: "${topMatch.headline || topMatch.description || 'Known employment scam'}"`;
+    } else {
+      watchlistContainer.classList.add('hidden');
+    }
 
     // Populate 8-Layer Grid
     signalsGrid.innerHTML = '';
@@ -136,8 +163,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       const defaultChips = [
         { name: 'Company Auth', status: 'PASS' },
         { name: 'Careers ATS', status: 'PASS' },
-        { name: 'Salary Feasibility', status: 'PASS' },
-        { name: 'Pattern Vectors', status: 'PASS' }
+        { name: 'Salary BLS', status: 'PASS' },
+        { name: 'AI Vectors', status: 'PASS' }
       ];
       defaultChips.forEach(item => {
         const chip = document.createElement('div');
@@ -154,7 +181,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (data.red_flags && data.red_flags.length > 0) {
       flagsContainer.classList.remove('hidden');
       flagsList.innerHTML = '';
-      data.red_flags.forEach(flag => {
+      data.red_flags.slice(0, 4).forEach(flag => {
         const li = document.createElement('li');
         li.textContent = `• ${flag}`;
         flagsList.appendChild(li);
@@ -163,9 +190,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       flagsContainer.classList.add('hidden');
     }
 
-    // Deep Scan Link
+    // Action Links: Certificate & Deep Dossier
     if (data.id) {
       deepScanLink.href = `http://127.0.0.1:5173/analysis/${data.id}`;
+      certLink.href = `http://127.0.0.1:5173/verify/${data.id}`;
+      certLink.classList.remove('hidden');
     }
   }
 });

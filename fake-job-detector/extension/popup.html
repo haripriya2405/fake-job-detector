@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JobScamScore Threat Scanner</title>
+  <title>SentinelJob AI — Scam Defense &amp; Intelligence</title>
   <link rel="stylesheet" href="popup.css">
 </head>
 <body>
@@ -17,18 +17,31 @@
           </svg>
         </div>
         <div class="brand-text">
-          <span class="brand-title">JobScamScore</span>
+          <span class="brand-title">SentinelJob AI</span>
           <span class="brand-subtitle">8-Layer Forensic Shield</span>
         </div>
       </div>
-      <div class="status-indicator live">LIVE</div>
+      <div class="status-indicator live">LIVE NODE</div>
     </header>
+
+    <!-- Quick Navigation Hub -->
+    <div class="quick-nav-bar">
+      <a href="http://127.0.0.1:5173/database" target="_blank" class="nav-pill" title="Community Threat Feed">
+        <span class="pill-dot"></span> Database
+      </a>
+      <a href="http://127.0.0.1:5173/simulator" target="_blank" class="nav-pill highlight" title="Play Interactive Scam Hunter Game">
+        🎮 Simulator
+      </a>
+      <a href="http://127.0.0.1:5173/guides/job-scam-red-flags" target="_blank" class="nav-pill" title="25 Red Flags Matrix">
+        🚩 25 Red Flags
+      </a>
+    </div>
 
     <!-- Main Content -->
     <main class="main">
       <!-- Page Context -->
       <div id="page-context" class="page-context">
-        <div class="context-label">DETECTED JOB LISTING</div>
+        <div class="context-label">ACTIVE JOB DETECTED</div>
         <div id="job-title-display" class="job-title-display">Extracting active page...</div>
         <div id="company-name-display" class="company-name-display">Scanning DOM elements...</div>
       </div>
@@ -36,20 +49,38 @@
       <!-- Action Button -->
       <button type="button" id="scan-btn" class="scan-btn">
         <span class="btn-icon">⚡</span>
-        <span id="scan-btn-text">Scan This Job Listing</span>
+        <span id="scan-btn-text">Run 8-Layer Forensic Scan</span>
       </button>
 
       <!-- Scan Progress / Results View -->
       <div id="results-view" class="results-view hidden">
         <div class="score-card">
           <div class="score-left">
-            <div class="score-label">RISK SCORE</div>
+            <div class="score-label">THREAT SCORE</div>
             <div id="risk-score" class="risk-score">--</div>
           </div>
           <div class="score-right">
             <div id="verdict-badge" class="verdict-badge">ANALYZING</div>
             <div id="verdict-desc" class="verdict-desc">Evaluating signal vectors...</div>
           </div>
+        </div>
+
+        <!-- VoIP & Carrier Threat Intel Alert (Dynamic) -->
+        <div id="voip-alert-container" class="intel-alert-box voip-alert hidden">
+          <div class="intel-alert-header">
+            <span class="intel-alert-icon">📞</span>
+            <span class="intel-alert-title">VOIP / RECRUITER PHONE INTEL</span>
+          </div>
+          <div id="voip-alert-content" class="intel-alert-body"></div>
+        </div>
+
+        <!-- Federal Watchlist Alert (FTC / BBB / IC3) (Dynamic) -->
+        <div id="watchlist-alert-container" class="intel-alert-box watchlist-alert hidden">
+          <div class="intel-alert-header">
+            <span class="intel-alert-icon">⚖️</span>
+            <span class="intel-alert-title">FEDERAL WATCHLIST MATCH</span>
+          </div>
+          <div id="watchlist-alert-content" class="intel-alert-body"></div>
         </div>
 
         <!-- 8-Layer Signal Breakdown -->
@@ -66,17 +97,22 @@
           <ul id="flags-list" class="flags-list"></ul>
         </div>
 
-        <!-- Deep Dossier Link -->
-        <a id="deep-scan-link" href="#" target="_blank" class="deep-scan-btn">
-          Open Full Forensic Security Dossier ↗
-        </a>
+        <!-- Action Links: Certificate & Full Dossier -->
+        <div class="action-buttons-group">
+          <a id="certificate-link" href="#" target="_blank" class="cert-action-btn hidden">
+            <span class="icon">📜</span> View Verification Certificate &amp; Badge ↗
+          </a>
+          <a id="deep-scan-link" href="#" target="_blank" class="deep-scan-btn">
+            Open Full Forensic Security Dossier ↗
+          </a>
+        </div>
       </div>
     </main>
 
     <!-- Footer -->
     <footer class="footer">
-      <span>Connected to Local Node (127.0.0.1:8000)</span>
-      <a href="http://127.0.0.1:5173" target="_blank" class="app-link">Open Dashboard</a>
+      <span>Connected to SentinelNode (127.0.0.1:8000)</span>
+      <a href="http://127.0.0.1:5173" target="_blank" class="app-link">Web App ↗</a>
     </footer>
   </div>
 
