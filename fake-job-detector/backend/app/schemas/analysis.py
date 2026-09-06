@@ -229,6 +229,12 @@ class AnalysisResponse(BaseModel):
     phone_intelligence: Optional[PhoneIntelligenceSchema] = None
     fraud_watchlists: Optional[FraudWatchlistSchema] = None
 
+    # Phase 22 Enterprise LLM, Archetype & Multi-Stage Pipeline
+    primary_archetype: Optional[str] = "OTHER"
+    secondary_archetypes: List[str] = Field(default_factory=list)
+    llm_synthesis: Optional[Dict[str, Any]] = None
+    pipeline_audit: Optional[Dict[str, Any]] = None
+
     model_config = ConfigDict(from_attributes=True)
 
 
