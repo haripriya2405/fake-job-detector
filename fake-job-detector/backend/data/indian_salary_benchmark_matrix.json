@@ -1,0 +1,62 @@
+{
+  "software_engineering": {
+    "p25_annual_inr": 685000.0,
+    "median_annual_inr": 950000.0,
+    "p90_annual_inr": 3900000.0000000005,
+    "max_credible_annual_inr": 6240000.000000001,
+    "p25_lpa": 6.85,
+    "median_lpa": 9.5,
+    "p90_lpa": 39.0,
+    "max_credible_lpa": 62.4,
+    "median_monthly_inr": 79167,
+    "max_credible_monthly_inr": 520000
+  },
+  "data_science_ai": {
+    "p25_annual_inr": 1140000.0,
+    "median_annual_inr": 1800000.0,
+    "p90_annual_inr": 2920000.0,
+    "max_credible_annual_inr": 4672000.0,
+    "p25_lpa": 11.4,
+    "median_lpa": 18.0,
+    "p90_lpa": 29.2,
+    "max_credible_lpa": 46.72,
+    "median_monthly_inr": 150000,
+    "max_credible_monthly_inr": 389333
+  },
+  "data_entry_typing": {
+    "p25_annual_inr": 245000.0,
+    "median_annual_inr": 270000.0,
+    "p90_annual_inr": 310000.0,
+    "max_credible_annual_inr": 496000.0,
+    "p25_lpa": 2.45,
+    "median_lpa": 2.7,
+    "p90_lpa": 3.1,
+    "max_credible_lpa": 4.96,
+    "median_monthly_inr": 22500,
+    "max_credible_monthly_inr": 41333
+  },
+  "customer_support": {
+    "p25_annual_inr": 400000.0,
+    "median_annual_inr": 460000.0,
+    "p90_annual_inr": 556000.0,
+    "max_credible_annual_inr": 889600.0,
+    "p25_lpa": 4.0,
+    "median_lpa": 4.6,
+    "p90_lpa": 5.56,
+    "max_credible_lpa": 8.9,
+    "median_monthly_inr": 38333,
+    "max_credible_monthly_inr": 74133
+  },
+  "sales_marketing": {
+    "p25_annual_inr": 467500.0,
+    "median_annual_inr": 485000.0,
+    "p90_annual_inr": 513000.0,
+    "max_credible_annual_inr": 820800.0,
+    "p25_lpa": 4.67,
+    "median_lpa": 4.85,
+    "p90_lpa": 5.13,
+    "max_credible_lpa": 8.21,
+    "median_monthly_inr": 40417,
+    "max_credible_monthly_inr": 68400
+  }
+}

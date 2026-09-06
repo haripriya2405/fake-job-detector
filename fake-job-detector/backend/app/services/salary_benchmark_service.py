@@ -4,6 +4,8 @@ and US BLS (Bureau of Labor Statistics in USD) to detect unrealistic compensatio
 """
 
 from typing import Any, Dict, List, Optional, Tuple
+import json
+from pathlib import Path
 import re
 from pydantic import BaseModel, Field
 
@@ -189,6 +191,23 @@ class SalaryBenchmarkService:
     """Extracts stated compensation and benchmarks against real-world Indian (INR/LPA) and Global (USD) market norms."""
 
     def __init__(self):
+        # Dynamically load empirical Indian matrix if available
+        self.indian_benchmarks = dict(INDIAN_MARKET_BENCHMARKS)
+        try:
+            matrix_path = Path(__file__).resolve().parent.parent.parent / "data" / "indian_salary_benchmark_matrix.json"
+            if matrix_path.exists():
+                with open(matrix_path, mode="r", encoding="utf-8") as f:
+                    custom_matrix = json.load(f)
+                    for fam, m in custom_matrix.items():
+                        if fam in self.indian_benchmarks:
+                            self.indian_benchmarks[fam]["median_annual"] = m.get("median_annual_inr", self.indian_benchmarks[fam]["median_annual"])
+                            self.indian_benchmarks[fam]["p25_annual"] = m.get("p25_annual_inr", self.indian_benchmarks[fam]["p25_annual"])
+                            self.indian_benchmarks[fam]["p90_annual"] = m.get("p90_annual_inr", self.indian_benchmarks[fam]["p90_annual"])
+                            self.indian_benchmarks[fam]["max_credible_monthly"] = m.get("max_credible_monthly_inr", self.indian_benchmarks[fam]["max_credible_monthly"])
+                            self.indian_benchmarks[fam]["max_credible_annual"] = m.get("max_credible_annual_inr", self.indian_benchmarks[fam]["max_credible_annual"])
+        except Exception:
+            pass
+
         # 🇮🇳 Indian INR & LPA Formulations Regex
         self.inr_patterns = [
             # 3.5 - 6 LPA / 8 LPA - 12 LPA / 3.5 to 6 Lakhs
@@ -232,7 +251,7 @@ class SalaryBenchmarkService:
     def match_job_family(self, title: str, text: str, is_inr: bool = False) -> str:
         """Classify job posting into an empirical benchmark job family."""
         combined = f"{title} {text}".lower()
-        benchmarks = INDIAN_MARKET_BENCHMARKS if is_inr else STANDARD_MARKET_BENCHMARKS
+        benchmarks = self.indian_benchmarks if is_inr else STANDARD_MARKET_BENCHMARKS
         for family, data in benchmarks.items():
             if family == "general_corporate":
                 continue
@@ -361,7 +380,7 @@ class SalaryBenchmarkService:
         min_amt, max_amt, freq, currency, snippet = extracted
         is_inr = (currency == "INR")
         family = self.match_job_family(job_title, text, is_inr=is_inr)
-        benchmark = INDIAN_MARKET_BENCHMARKS[family] if is_inr else STANDARD_MARKET_BENCHMARKS[family]
+        benchmark = self.indian_benchmarks[family] if is_inr else STANDARD_MARKET_BENCHMARKS[family]
         curr_sym = "₹" if is_inr else "$"
 
         # Annualize based on frequency and currency
