@@ -2,10 +2,51 @@ from typing import Any, Dict, List, Optional
 
 
 class FraudWatchlistService:
-    """Cross-references job postings against official FTC, BBB Scam Tracker, and FBI IC3 fraud advisories."""
+    """Cross-references job postings against official Indian (I4C / Cybercrime.gov.in / 1930 Helpline / RBI)
+    and Global (FTC, BBB Scam Tracker, and FBI IC3) fraud advisories.
+    """
 
     # Curated official fraud database advisories
     WATCHLIST_RECORDS = [
+        # 🇮🇳 Indian Cybercrime & National Fraud Advisories
+        {
+            "id": "I4C-MHA-2024-01",
+            "agency": "Indian Cyber Crime Coordination Centre (I4C / 1930 Helpline)",
+            "agency_code": "I4C_MHA",
+            "title": "Part-Time Task & YouTube Video Liking Recharge Fraud",
+            "threat_type": "TASK_RECHARGE",
+            "keywords": ["like youtube", "like 3 videos", "task recharge", "hotel rating task", "daily commission 2000", "daily task recharge", "earn 3000 daily", "earn 5000 daily"],
+            "summary": "Scammers contact victims via WhatsApp/Telegram offering ₹150 for liking videos, then lure them into fake investment task portals demanding escalating UPI/crypto deposits.",
+            "reference_url": "https://cybercrime.gov.in",
+            "severity": "CRITICAL",
+            "risk_penalty": 30,
+        },
+        {
+            "id": "I4C-MHA-2024-02",
+            "agency": "National Cyber Crime Reporting Portal (cybercrime.gov.in)",
+            "agency_code": "I4C_MHA",
+            "title": "Fake Offer Letters & UPI Security Deposit / Gate Pass Scam",
+            "threat_type": "UPFRONT_UPI_FEE",
+            "keywords": ["gpay", "phonepe", "paytm", "upi id", "gate pass fee", "laptop security deposit", "courier charges before joining", "medical clearance fee", "offer letter verification charge"],
+            "summary": "Impostors send forged offer letters from top Indian IT firms (TCS, Infosys, Wipro, Tata) and demand ₹1,500 - ₹15,000 via UPI as refundable security/laptop gate pass deposit.",
+            "reference_url": "https://cybercrime.gov.in",
+            "severity": "CRITICAL",
+            "risk_penalty": 30,
+        },
+        {
+            "id": "RBI-ADVISORY-2024-03",
+            "agency": "Reserve Bank of India (RBI) / Consumer Education",
+            "agency_code": "RBI",
+            "title": "Illegal Work-From-Home Job Loan & Commission Mule Schemes",
+            "threat_type": "MONEY_MULE",
+            "keywords": ["receive in your account and transfer", "forward upi payment", "commission for receiving funds", "rent your bank account", "kyc document for salary account before interview"],
+            "summary": "Fraud networks recruit students and job seekers as money mules by asking them to route unauthorized UPI funds through their personal savings accounts.",
+            "reference_url": "https://rbi.org.in",
+            "severity": "CRITICAL",
+            "risk_penalty": 25,
+        },
+
+        # 🌐 Global & US Federal Advisories
         {
             "id": "FTC-ALERT-2024-01",
             "agency": "Federal Trade Commission (FTC)",
@@ -60,13 +101,18 @@ class FraudWatchlistService:
             "agency_code": "FBI_IC3",
             "title": "Cyber Criminals Use Spoofed Domains to Steal Personally Identifiable Information",
             "threat_type": "DATA_HARVESTING",
-            "keywords": ["driver license", "social security number", "ssn", "voided check", "direct deposit form before interview"],
-            "summary": "Threat actors create lookalike domains to harvest applicant SSNs, government IDs, and banking information for synthetic identity theft.",
+            "keywords": ["driver license", "social security number", "ssn", "voided check", "direct deposit form before interview", "aadhaar card copy", "pan card upload before interview"],
+            "summary": "Threat actors create lookalike domains to harvest applicant government IDs, Aadhaar/PAN details, and banking information for synthetic identity theft.",
             "reference_url": "https://www.ic3.gov/Media/Y2023/PSA230321",
             "severity": "HIGH",
             "risk_penalty": 20,
         },
     ]
+
+    @classmethod
+    def get_all_advisories(cls) -> List[Dict[str, Any]]:
+        """Return all curated watchlist advisories."""
+        return cls.WATCHLIST_RECORDS
 
     def cross_reference_posting(
         self,
@@ -74,7 +120,7 @@ class FraudWatchlistService:
         company_name: Optional[str] = None,
         job_url: Optional[str] = None,
     ) -> Dict[str, Any]:
-        """Cross-reference text and metadata against FTC, BBB, and FBI IC3 advisories."""
+        """Cross-reference text and metadata against Indian (I4C/MHA/RBI) and Federal (FTC/BBB/IC3) advisories."""
         content = f"{text} {company_name or ''} {job_url or ''}".lower()
 
         matches = []
@@ -98,27 +144,21 @@ class FraudWatchlistService:
                 agencies_flagged.add(record["agency_code"])
                 total_penalty += record["risk_penalty"]
 
-        # Cap penalty at 30
-        final_penalty = min(30, total_penalty)
-
-        has_match = len(matches) > 0
-        status_verdict = "MATCHED_WARNING" if has_match else "CLEAN_PASS"
-
+        has_matches = len(matches) > 0
         return {
-            "has_watchlist_matches": has_match,
-            "status_verdict": status_verdict,
+            "has_watchlist_matches": has_matches,
+            "has_watchlist_match": has_matches,
+            "status_verdict": "MATCHED_WARNING" if has_matches else "CLEAN_PASS",
             "match_count": len(matches),
-            "agencies_checked": ["FTC", "BBB", "FBI_IC3"],
+            "matches_count": len(matches),
             "agencies_flagged": list(agencies_flagged),
+            "risk_penalty": min(40, total_penalty),
+            "total_risk_penalty": min(40, total_penalty),
             "matches": matches,
-            "risk_penalty": final_penalty,
+            "matches_found": matches,
+            "national_helpline": "1930 (National Cyber Crime Reporting Portal - India)" if any(a.startswith("I4C") or a == "RBI" for a in agencies_flagged) else "Report to FTC / IC3",
         }
 
-    @classmethod
-    def get_all_advisories(cls) -> List[Dict[str, Any]]:
-        """Retrieve all active external fraud advisories."""
-        return cls.WATCHLIST_RECORDS
 
-
+# Singleton instance
 fraud_watchlist_service = FraudWatchlistService()
-

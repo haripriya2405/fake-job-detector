@@ -305,4 +305,42 @@ RULE_REGISTRY: List[RuleDefinition] = [
         recommendation="Do not send funds. Any portal requiring a recharge to withdraw earned money is an investment task trap.",
         pattern=re.compile(r'\b(deposit to unlock|activate commission portal|withdrawal enabled upon completing|vip rating tasks)\b', re.IGNORECASE),
     ),
+
+    # -------------------------------------------------------------
+    # Category G: 🇮🇳 India-Specific Fraud Vectors (Max Category Cap: 30)
+    # -------------------------------------------------------------
+    RuleDefinition(
+        code="FIN_UPI_QR_PAYMENT",
+        name="Demands UPI / QR Code / GPay / PhonePe / Paytm Payment",
+        category="financial",
+        severity="critical",
+        default_weight=30,
+        confidence=0.99,
+        description="Candidate is instructed to transfer funds via UPI, Google Pay, PhonePe, Paytm, or scan a QR code for application processing, ID cards, or training kits.",
+        recommendation="Never make UPI or QR code transfers for any job. Legitimate Indian employers (TCS, Infosys, Wipro, etc.) NEVER charge application or onboarding fees.",
+        pattern=re.compile(r'\b(gpay|phonepe|paytm|bhim upi|upi id|scan (?:the )?qr code|pay through upi|transfer to upi|gate pass fee|laptop security deposit|refundable security via upi)\b', re.IGNORECASE),
+    ),
+    RuleDefinition(
+        code="RECRUIT_INDIAN_IT_IMPERSONATION",
+        name="Unauthorized Indian Enterprise Impersonation (TCS, Infosys, Wipro, Tata)",
+        category="manipulation",
+        severity="critical",
+        default_weight=25,
+        confidence=0.95,
+        description="Posting claims to represent top Indian corporate giants (TCS, Infosys, Wipro, Tata, HCL, Reliance) while using unofficial communication channels or demanding fees.",
+        recommendation="Top Indian IT firms have strict zero-fee policies and only contact candidates from corporate domains (@tcs.com, @infosys.com, @wipro.com). Report to 1930 Cybercrime Helpline.",
+        pattern=re.compile(r'\b(?:tcs|infosys|wipro|tata motors|tata consultancy|hcl tech|tech mahindra|reliance jio|cognizant)\b.*?(?:registration fee|processing fee|interview fee|gate pass|security deposit|@gmail\.com|@yahoo\.com|whatsapp only)', re.IGNORECASE),
+    ),
+    RuleDefinition(
+        code="DATA_AADHAAR_PAN_HARVESTING",
+        name="Mandatory Aadhaar / PAN / OTP Upload Before Screening",
+        category="data_privacy",
+        severity="high",
+        default_weight=20,
+        confidence=0.92,
+        description="Candidate is required to submit clear copies of Aadhaar card, PAN card, or share OTP codes prior to any official interview.",
+        recommendation="Do not share Aadhaar or PAN details on unverified forms or messaging apps. Masked Aadhaar should only be provided during formal verified onboarding.",
+        pattern=re.compile(r'\b(aadhaar card|pan card photo|upload aadhaar|send pan copy|aadhaar otp|submit aadhaar and pan before interview)\b', re.IGNORECASE),
+    ),
 ]
+
