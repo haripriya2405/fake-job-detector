@@ -86,15 +86,21 @@ def generate_indian_tech_salaries_dataset(filepath: Path):
 
 
 def generate_indian_scam_incidents_dataset(filepath: Path):
-    """Generate Indian Cybercrime & WhatsApp/Telegram Job Scam Corpus."""
+    """Generate Indian Cybercrime & WhatsApp/Telegram Job Scam Corpus (I4C / 1930 / MHA)."""
     rows = [
         ["incident_id", "scam_category", "platform", "claimed_compensation", "payment_channel", "scam_script_snippet", "advisory_agency"],
-        ["IN-SCAM-01", "YouTube Like & Subscribe Recharge", "WhatsApp / Telegram", "Rs. 150/video (Rs. 3,000 daily)", "UPI / Crypto USDT", "Hi! I am HR from global media. Like 3 YouTube videos to get Rs. 150 instantly. Join Telegram to recharge VIP task account.", "I4C 1930 Helpline"],
-        ["IN-SCAM-02", "Data Entry Daily Pay Trap", "SMS / WhatsApp", "Rs. 3,500 - Rs. 5,000 / day", "UPI / Google Pay", "Urgent Part-time home typing work. Earn Rs. 50 per form, Rs. 4,000 daily. Pay Rs. 1,999 registration fee for software key.", "MHA cybercrime.gov.in"],
+        ["IN-SCAM-01", "YouTube Like & Subscribe Recharge", "WhatsApp / Telegram", "Rs. 150/video (Rs. 3,000 daily)", "UPI / Crypto USDT", "Hi! I am HR from global media agency. Like 3 YouTube videos to get Rs. 150 instantly. Join Telegram to recharge VIP task account and withdraw daily salary.", "I4C 1930 Helpline"],
+        ["IN-SCAM-02", "Data Entry Daily Pay Trap", "SMS / WhatsApp", "Rs. 3,500 - Rs. 5,000 / day", "UPI / Google Pay", "Urgent Part-time home typing work. Earn Rs. 50 per form, Rs. 4,000 daily. Pay Rs. 1,999 registration fee for software license key.", "MHA cybercrime.gov.in"],
         ["IN-SCAM-03", "Fake TCS / Wipro Appointment Letter", "Email / WhatsApp", "6.5 LPA", "UPI QR Code", "Congratulations! Selected for TCS System Engineer without interview. Pay Rs. 4,500 refundable security deposit for company laptop gatepass.", "TCS Security Advisory / 1930"],
         ["IN-SCAM-04", "Hotel Review & Google Maps Rating", "Telegram", "Rs. 2,500 daily commission", "UPI ID deposit", "Rate 5-star for hotels on Google Maps. Complete 20 tasks. Negative balance requires deposit to withdraw wallet funds.", "I4C 1930 Helpline"],
         ["IN-SCAM-05", "Aadhaar Card OTP Verification Fraud", "Google Forms / WhatsApp", "Rs. 35,000 / month", "NetBanking / OTP", "Government recognized data entry project. Upload Aadhaar card copy and verify Aadhaar OTP to activate salary account.", "RBI / Cybercrime Portal"],
         ["IN-SCAM-06", "Courier / Medical Clearance Fee Scam", "Email / SMS", "4.8 LPA (Tata Motors)", "PhonePe / Paytm", "Tata Motors shortlisted your resume for Back Office. Transfer Rs. 2,200 for medical test kit and courier delivery.", "Tata Motors Anti-Fraud Cell"],
+        ["IN-SCAM-07", "Airline Ground Staff Direct Selection", "WhatsApp / SMS", "Rs. 45,000 / month (IndiGo / Air India)", "GPay UPI", "Direct joining for Airport Ground Staff / Cargo Assistant in Mumbai/Delhi Airport. No interview needed. Transfer Rs. 3,500 for uniform & security badge.", "Airport Authority of India / 1930"],
+        ["IN-SCAM-08", "Captcha Typing Software License Trap", "WhatsApp", "Rs. 1,200 / 1000 Captchas (Rs. 60k/mo)", "UPI QR Code", "Work from home 2 hours daily captcha typing. Earn up to Rs. 60,000 per month. Mandatory Rs. 999 activation fee for specialized OCR software.", "Delhi Police Cyber Cell"],
+        ["IN-SCAM-09", "Amazon / Flipkart Mall Order Boosting", "Telegram / WhatsApp", "10% commission on orders", "Crypto USDT / UPI", "Part time task: Boost merchant rating on Amazon Mall. Deposit funds to buy orders, get instant 10% refund + commission back.", "I4C 1930 Helpline"],
+        ["IN-SCAM-10", "SMS Sending / Copy Paste Freelance Fraud", "Telegram", "Rs. 10 per SMS (Rs. 2,000/day)", "UPI ID", "Send marketing SMS from your personal phone number. Earn Rs. 2,000 daily. Deposit Rs. 1,499 security deposit before database access.", "Bangalore Cyber Crime Police"],
+        ["IN-SCAM-11", "Fake Government Railway RRB Job Placement", "WhatsApp / Email", "Rs. 52,000 / month (Govt Pay Band)", "Bank Transfer", "Direct selection for Indian Railways Ticket Collector / Clerk quota. Pay Rs. 25,000 for document verification and appointment letter.", "Ministry of Railways / Cybercrime"],
+        ["IN-SCAM-12", "Overseas Dubai / Singapore Work Permit Scam", "Instagram / WhatsApp", "Rs. 1.8 Lakhs / month", "UPI / Wire Transfer", "Immediate vacancy for Dubai Hotel / Construction Supervisor. Visa processed in 7 days. Pay Rs. 15,000 embassy fee via UPI.", "Ministry of External Affairs (MEA)"],
     ]
 
     with open(filepath, mode="w", newline="", encoding="utf-8") as f:
