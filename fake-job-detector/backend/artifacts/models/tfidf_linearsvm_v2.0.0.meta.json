@@ -2,24 +2,24 @@
   "version": "v2.0.0",
   "algorithm": "LinearSVM",
   "filename": "tfidf_linearsvm_v2.0.0.joblib",
-  "sha256_checksum": "b433fd7d87d9fb4871302aaac33aba74d77a313041b86eb47217f6feea12f328",
-  "created_at": "2026-09-05T15:39:31.548403+00:00",
+  "sha256_checksum": "7ee23b7b473aff7b047db5b78dedd2a45f57fc1684d7f8d6f37db4698d79a555",
+  "created_at": "2026-09-06T17:31:18.071326+00:00",
   "metrics": {
-    "accuracy": 0.9503,
-    "precision": 0.959,
-    "recall": 0.899,
-    "f1_score": 0.928,
-    "roc_auc": 0.9878,
-    "pr_auc": 0.9798,
-    "false_positive_rate": 0.0213,
-    "false_negative_rate": 0.101,
-    "brier_score": 0.0415,
-    "expected_calibration_error": 0.0366,
+    "accuracy": 0.9249,
+    "precision": 0.9196,
+    "recall": 0.8673,
+    "f1_score": 0.8927,
+    "roc_auc": 0.9639,
+    "pr_auc": 0.9369,
+    "false_positive_rate": 0.0427,
+    "false_negative_rate": 0.1327,
+    "brier_score": 0.076,
+    "expected_calibration_error": 0.0947,
     "confusion_matrix": {
-      "TP": 187,
-      "TN": 368,
-      "FP": 8,
-      "FN": 21
+      "TP": 183,
+      "TN": 359,
+      "FP": 16,
+      "FN": 28
     }
   }
 }

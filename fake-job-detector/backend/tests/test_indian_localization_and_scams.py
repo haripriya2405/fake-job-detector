@@ -70,3 +70,41 @@ def test_indian_cybercrime_1930_watchlist_match():
     assert match_res["has_watchlist_matches"] is True
     assert "I4C_MHA" in match_res["agencies_flagged"]
     assert "1930" in match_res["national_helpline"]
+
+
+def test_ai_explainer_indian_safety_advisory():
+    """Verify AI Explainer synthesizes Indian-specific safety advisories (1930, cybercrime.gov.in, UPI caution) for high-risk Indian postings."""
+    from app.services.ai_explainer import ai_explainer
+
+    indian_fraud_text = "TCS direct selection for System Engineer. CTC 6.5 LPA. Pay Rs. 4,500 refundable laptop gatepass fee via PhonePe UPI."
+    explanation = ai_explainer.generate_explanation(
+        raw_text=indian_fraud_text,
+        job_title="System Engineer",
+        company_name="TCS",
+        risk_score=92,
+        risk_level="critical",
+        ml_prob=0.88,
+    )
+
+    assert "UPI" in explanation or "GPay" in explanation
+    assert "1930" in explanation
+    assert "cybercrime.gov.in" in explanation
+
+
+def test_ai_explainer_global_safety_fallback():
+    """Verify AI Explainer uses standard international advisories (FTC / IC3) when text is global/USD."""
+    from app.services.ai_explainer import ai_explainer
+
+    global_fraud_text = "We will send a $4,500 cashier check to purchase home office equipment. Wire remaining $3,500 back via Western Union."
+    explanation = ai_explainer.generate_explanation(
+        raw_text=global_fraud_text,
+        job_title="Administrative Assistant",
+        company_name="Global Tech Corp",
+        risk_score=95,
+        risk_level="critical",
+        ml_prob=0.92,
+    )
+
+    assert "cashier check" in explanation or "wire" in explanation
+    assert "FTC" in explanation or "IC3" in explanation or "off-platform" in explanation
+

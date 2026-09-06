@@ -168,6 +168,66 @@ class MultiDatasetIngestion:
             except Exception as e:
                 logger.warning(f"Failed to load postings.csv: {e}")
 
+        # 5. Ingest Indian Job Postings (data/naukri_jobs_india.csv)
+        naukri_path = os.path.join(self.data_dir, "naukri_jobs_india.csv")
+        if os.path.exists(naukri_path):
+            try:
+                df_naukri = pd.read_csv(naukri_path)
+                for idx, row in df_naukri.iterrows():
+                    title = str(row.get("job_title", "")) if pd.notna(row.get("job_title")) else ""
+                    company = str(row.get("company_name", "")) if pd.notna(row.get("company_name")) else ""
+                    loc = str(row.get("location", "")) if pd.notna(row.get("location")) else ""
+                    salary = str(row.get("salary_raw", "")) if pd.notna(row.get("salary_raw")) else ""
+                    exp = str(row.get("experience_years", "")) if pd.notna(row.get("experience_years")) else ""
+                    skills = str(row.get("skills", "")) if pd.notna(row.get("skills")) else ""
+                    
+                    full_text = f"{title} at {company} ({loc}). Salary: {salary}. Experience required: {exp}. Key Skills: {skills}. Standard recruitment process with technical interviews and HR screening. Apply via official portal."
+                    norm_text = self._normalize_text(full_text)
+                    if len(norm_text) < 30:
+                        continue
+                    
+                    records.append({
+                        "record_id": f"NAUKRI-{idx:04d}",
+                        "job_title": title if title else "Indian Enterprise Role",
+                        "company_name": company if company else "Indian Corporate",
+                        "raw_text": norm_text,
+                        "label": 0,
+                        "category": "indian_enterprise_legitimate",
+                        "source_name": "Naukri / Indian Tech Job Corpus",
+                    })
+            except Exception as e:
+                logger.warning(f"Failed to load naukri_jobs_india.csv: {e}")
+
+        # 6. Ingest Indian Cybercrime & Task Scam Incidents (data/indian_scam_incidents.csv)
+        scam_path = os.path.join(self.data_dir, "indian_scam_incidents.csv")
+        if os.path.exists(scam_path):
+            try:
+                df_scam = pd.read_csv(scam_path)
+                for idx, row in df_scam.iterrows():
+                    cat = str(row.get("scam_category", "")) if pd.notna(row.get("scam_category")) else "Indian Recruitment Fraud"
+                    plat = str(row.get("platform", "")) if pd.notna(row.get("platform")) else ""
+                    comp = str(row.get("claimed_compensation", "")) if pd.notna(row.get("claimed_compensation")) else ""
+                    channel = str(row.get("payment_channel", "")) if pd.notna(row.get("payment_channel")) else ""
+                    snippet = str(row.get("scam_script_snippet", "")) if pd.notna(row.get("scam_script_snippet")) else ""
+                    advisory = str(row.get("advisory_agency", "")) if pd.notna(row.get("advisory_agency")) else ""
+                    
+                    full_text = f"{cat} outreach on {plat}. Offering {comp}. Payment via {channel}. Script: {snippet} Advisory by: {advisory}."
+                    norm_text = self._normalize_text(full_text)
+                    if len(norm_text) < 25:
+                        continue
+                    
+                    records.append({
+                        "record_id": f"IN-SCAM-{idx:04d}",
+                        "job_title": cat,
+                        "company_name": "Fraudulent Entity / Scam Syndicate",
+                        "raw_text": norm_text,
+                        "label": 1,
+                        "category": "indian_recruitment_cybercrime",
+                        "source_name": "I4C Indian Cybercrime Incident Corpus",
+                    })
+            except Exception as e:
+                logger.warning(f"Failed to load indian_scam_incidents.csv: {e}")
+
         raw_count = len(records)
         df_raw = pd.DataFrame(records)
 

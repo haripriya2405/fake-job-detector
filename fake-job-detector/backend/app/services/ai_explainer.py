@@ -30,12 +30,48 @@ class AIExplainer:
         gemini_key = os.getenv("GEMINI_API_KEY") or os.getenv("LLM_API_KEY")
         openai_key = os.getenv("OPENAI_API_KEY")
 
+    @staticmethod
+    def _is_indian_recruitment_context(text: str, title: Optional[str] = None, company: Optional[str] = None) -> bool:
+        """Heuristic check if job posting or message originates from Indian recruitment ecosystem."""
+        combined = f"{text} {title or ''} {company or ''}".lower()
+        indian_tokens = [
+            "₹", "rs.", "rs ", "inr", "lpa", "lakh", "crore", "ctc",
+            "upi", "gpay", "phonepe", "paytm", "bhim",
+            "aadhaar", "pan card", "1930", "cybercrime.gov.in", "i4c",
+            "naukri", "internshala", "foundit", "shine.com", "apna.co",
+            "bangalore", "bengaluru", "hyderabad", "pune", "mumbai", "gurgaon", "noida", "chennai", "delhi",
+            "tcs", "infosys", "wipro", "hcl", "tata consultancy", "swiggy", "zomato", "flipkart",
+        ]
+        return any(tok in combined for tok in indian_tokens)
+
+    @staticmethod
+    async def generate_llm_explanation_async(
+        raw_text: str,
+        job_title: Optional[str] = None,
+        company_name: Optional[str] = None,
+        risk_score: int = 0,
+        risk_level: str = "low",
+        verification_signals: Optional[Dict[str, Any]] = None,
+    ) -> Optional[Dict[str, Any]]:
+        """Call Gemini or OpenAI LLM API with strict factual grounding on verification signals."""
+        gemini_key = os.getenv("GEMINI_API_KEY") or os.getenv("LLM_API_KEY")
+        openai_key = os.getenv("OPENAI_API_KEY")
+
         if not gemini_key and not openai_key:
             return None
+
+        is_indian = AIExplainer._is_indian_recruitment_context(raw_text, job_title, company_name)
+        regional_context = (
+            "REGIONAL CONTEXT: Indian recruitment ecosystem (INR ₹, LPA, UPI, Cybercrime India / 1930 helpline). "
+            "If suspicious, emphasize that legitimate Indian employers (TCS, Infosys, Wipro, etc.) NEVER charge fees via UPI "
+            "and candidates should report fraud to 1930 Helpline or cybercrime.gov.in."
+            if is_indian else "REGIONAL CONTEXT: Global recruitment ecosystem (USD $, Wire transfers, Cashier checks, FTC / IC3)."
+        )
 
         prompt = f"""
 You are an expert Cybersecurity & Job Fraud Forensic Analyst. Analyze the following job posting telemetry and verification signals:
 
+{regional_context}
 Job Title: {job_title or 'Unknown'}
 Company: {company_name or 'Unknown'}
 Calculated Risk Score: {risk_score}/100 ({risk_level.upper()})
@@ -122,6 +158,7 @@ Do NOT hallucinate facts not present in the telemetry.
     ) -> str:
         """Construct a structured, multi-section forensic explanation grounded on empirical evidence."""
         lines = []
+        is_indian = AIExplainer._is_indian_recruitment_context(raw_text, job_title, company_name)
 
         # 1. Document & Ingestion Synopsis
         src_label = source_type.upper()
@@ -207,18 +244,33 @@ Do NOT hallucinate facts not present in the telemetry.
         if careers_explanation:
             lines.append(f"\n#### Careers Page & Application Channel:\n• {careers_explanation}")
 
-        # 7. Actionable Next Steps
+        # 7. Actionable Next Steps (Localized for Indian & Global users)
         lines.append("\n#### Recommended Next Steps:")
         if risk_level in ["critical", "high"]:
-            lines.append("1. **Do not send money or banking info**: Never purchase equipment from vendor links or deposit cashier checks.")
-            lines.append("2. **Do not communicate off-platform**: Cease communication immediately if asked to move to Telegram, WhatsApp, or personal email.")
-            lines.append("3. **Cross-reference officially**: Search the legitimate company's official career portal to confirm if the requisition ID actually exists.")
+            if is_indian:
+                lines.append("1. **Do not send money via UPI/QR code**: Major Indian IT enterprises (TCS, Infosys, Wipro, Cognizant, etc.) **never charge fees** for registration, laptop gatepass, or security deposits.")
+                lines.append("2. **Protect Aadhaar & PAN**: Never share your Aadhaar OTP or banking passwords with unverified recruiters over WhatsApp or Telegram.")
+                lines.append("3. **Report to Indian Authorities**: Lodge a complaint with the **National Cyber Crime Reporting Portal** at [cybercrime.gov.in](https://cybercrime.gov.in) or call the **1930 National Cybercrime Helpline**.")
+                lines.append("4. **Cross-reference Official Careers**: Apply directly through verified enterprise career portals (e.g., `ibegin.tcs.com`, `careers.infosys.com`) or trusted portals (Naukri, Internshala).")
+            else:
+                lines.append("1. **Do not send money or banking info**: Never purchase equipment from vendor links, wire funds, or deposit cashier checks.")
+                lines.append("2. **Do not communicate off-platform**: Cease communication immediately if asked to move to Telegram, WhatsApp, or personal email.")
+                lines.append("3. **Cross-reference officially**: Search the legitimate company's official career portal to confirm if the requisition ID actually exists.")
+                lines.append("4. **Report Scam**: File an alert with the FTC at [reportfraud.ftc.gov](https://reportfraud.ftc.gov) or FBI IC3.")
         elif risk_level == "medium":
-            lines.append("1. **Verify recruiter credentials**: Confirm the sender's identity through official LinkedIn corporate staff profiles or corporate email domain.")
-            lines.append("2. **Refuse upfront fees**: Legitimate employers will never request security deposits, background check fees, or training costs.")
-            lines.append("3. **Cross-verify posting**: Check if this exact role is advertised on the company's verified primary domain.")
+            if is_indian:
+                lines.append("1. **Verify Recruiter Credentials**: Ensure the recruiter uses an official company domain email (not generic `@gmail.com` or spoofed domains).")
+                lines.append("2. **Refuse Upfront Charges**: Legitimate Indian companies do not require payment for software license keys, typing kits, or interview slots.")
+                lines.append("3. **Check Official Portals**: Search for the job opening on official portals (Naukri, LinkedIn, or the employer's official website).")
+            else:
+                lines.append("1. **Verify recruiter credentials**: Confirm the sender's identity through official LinkedIn corporate staff profiles or corporate email domain.")
+                lines.append("2. **Refuse upfront fees**: Legitimate employers will never request security deposits, background check fees, or training costs.")
+                lines.append("3. **Cross-verify posting**: Check if this exact role is advertised on the company's verified primary domain.")
         else:
-            lines.append("1. **Standard Due Diligence**: The posting shows clean metrics. Ensure you submit your application directly through the employer's official verified portal.")
+            if is_indian:
+                lines.append("1. **Standard Due Diligence**: The posting exhibits clean enterprise markers. Submit your application directly through the employer's official portal or verified portal (Naukri, LinkedIn, Internshala).")
+            else:
+                lines.append("1. **Standard Due Diligence**: The posting shows clean metrics. Ensure you submit your application directly through the employer's official verified portal.")
 
         return "\n".join(lines)
 
