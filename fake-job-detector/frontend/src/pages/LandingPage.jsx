@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, ShieldCheck, Sparkles, User, History, LayoutDashboard } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 import { HeroScannerCard } from '../components/scanner/HeroScannerCard';
 import { HowItWorks } from '../components/home/HowItWorks';
 import { SignalArchitectureGrid } from '../components/home/SignalArchitectureGrid';
@@ -10,6 +11,7 @@ import { BottomCtaBanner } from '../components/home/BottomCtaBanner';
 
 export const LandingPage = () => {
   const navigate = useNavigate();
+  const { isAuthenticated, user } = useAuth();
 
   const handleSelectSample = (sample) => {
     navigate(`/analysis/${sample.id}`, { state: { samplePreset: sample } });
@@ -34,9 +36,22 @@ export const LandingPage = () => {
             {/* Left Column (5 cols / ~45%) */}
             <div className="lg:col-span-5 text-center lg:text-left space-y-6 min-w-0">
               
-              <p className="text-[10px] sm:text-[11px] font-mono font-medium uppercase tracking-[0.2em] text-fog">
-                Free AI job scam checker
-              </p>
+              {isAuthenticated ? (
+                /* Authenticated State Banner with Smooth Pulse Animation */
+                <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs font-mono shadow-lg shadow-emerald-500/5 animate-fadeIn">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                  </span>
+                  <span className="font-semibold">Welcome back, {user?.full_name?.split(' ')[0] || user?.email?.split('@')[0] || 'Analyst'}</span>
+                  <span className="text-fog">|</span>
+                  <span className="text-[11px] text-emerald-400/90 uppercase tracking-wider font-semibold">Pro Suite Active</span>
+                </div>
+              ) : (
+                <p className="text-[10px] sm:text-[11px] font-mono font-medium uppercase tracking-[0.2em] text-fog">
+                  Free AI job scam checker
+                </p>
+              )}
 
               <h1 className="text-4xl sm:text-5xl lg:text-[3.75rem] font-medium tracking-[-0.02em] leading-[1.05] text-frost">
                 Check if a job is a <br className="hidden sm:inline" />
@@ -45,8 +60,38 @@ export const LandingPage = () => {
               </h1>
 
               <p className="text-base sm:text-lg text-mist max-w-md mx-auto lg:mx-0 leading-relaxed font-light">
-                Paste any job link or message. Get a <span className="text-frost font-normal">0–100 risk score</span> with every red flag explained — first scan <span className="text-frost font-normal">free with no account required</span>.
+                {isAuthenticated ? (
+                  <>
+                    Your account is equipped with <span className="text-frost font-normal">unlimited forensic scans</span>, 13-stage pipeline telemetry, and instant cloud history sync.
+                  </>
+                ) : (
+                  <>
+                    Paste any job link or message. Get a <span className="text-frost font-normal">0–100 risk score</span> with every red flag explained — first scan <span className="text-frost font-normal">free with no account required</span>.
+                  </>
+                )}
               </p>
+
+              {/* Authenticated Fast Navigation Pill */}
+              {isAuthenticated && (
+                <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 pt-1 animate-fadeIn">
+                  <Link
+                    to="/dashboard"
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-mono text-frost transition-all duration-200 hover:border-emerald-500/40 group"
+                  >
+                    <LayoutDashboard className="w-3.5 h-3.5 text-emerald-400 group-hover:scale-110 transition-transform" />
+                    <span>My Dashboard</span>
+                    <ArrowRight className="w-3 h-3 text-fog group-hover:translate-x-0.5 transition-transform" />
+                  </Link>
+
+                  <Link
+                    to="/history"
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-mono text-fog hover:text-frost transition-all duration-200 hover:border-white/20 group"
+                  >
+                    <History className="w-3.5 h-3.5 text-fog group-hover:text-emerald-400 transition-colors" />
+                    <span>Scan History</span>
+                  </Link>
+                </div>
+              )}
 
               {/* 3-Stat Metric Bar matching Screenshot 1 */}
               <div className="pt-6 sm:pt-8 border-t border-white/10 max-w-xl mx-auto lg:mx-0">
