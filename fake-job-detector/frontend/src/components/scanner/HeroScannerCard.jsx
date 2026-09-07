@@ -17,7 +17,9 @@ import {
 import { analysisService } from '../../services/analysisService';
 import { useToast } from '../../hooks/useToast';
 import { useAuth } from '../../context/AuthContext';
+import { useLanguage } from '../../hooks/useLanguage';
 import { GoogleAuthModal } from '../auth/GoogleAuthModal';
+import ScanLoadingOverlay from './ScanLoadingOverlay';
 
 const SCAN_STAGES = [
   'Scanning...',
@@ -34,6 +36,7 @@ export const HeroScannerCard = ({ onSampleClick }) => {
   const navigate = useNavigate();
   const { error, success } = useToast();
   const { isAuthenticated, guestScanCount, incrementGuestScan } = useAuth();
+  const { t } = useLanguage();
 
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [activeTab, setActiveTab] = useState('text'); // 'text' | 'url' | 'file'
@@ -184,27 +187,46 @@ export const HeroScannerCard = ({ onSampleClick }) => {
 
       <div className="relative rounded-2xl glass-modal p-5 sm:p-7 shadow-2xl border border-white/10 bg-[#07100c]/90">
         
+        {/* Top Floating Toast Alert matching job1.mp4 */}
+        {!isAuthenticated && guestScanCount >= 1 && (
+          <div className="mb-4 animate-in slide-in-from-top-4 duration-300">
+            <div className="flex items-center justify-between gap-3 p-3 rounded-xl bg-gradient-to-r from-amber-950/60 via-amber-900/40 to-amber-950/60 border border-amber-500/40 text-amber-300 shadow-lg shadow-amber-500/10 text-xs">
+              <div className="flex items-center gap-2 font-medium">
+                <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 animate-bounce" />
+                <span>⚠️ You've used your free scan for this device. Create a free account to scan more jobs.</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowAuthModal(true)}
+                className="px-3 py-1 rounded-lg bg-amber-500 hover:bg-amber-400 text-black font-semibold text-[11px] shrink-0 transition-colors shadow"
+              >
+                Sign In Free
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Top Header with quota badge */}
         <div className="mb-4 flex items-center justify-between gap-3">
           <p className="flex min-w-0 items-center gap-2 text-[11px] font-mono font-medium text-fog">
-            <span className="inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-400" aria-hidden="true" />
+            <span className="inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-400 animate-ping" aria-hidden="true" />
             <span className="truncate tracking-wider">Paste text · URL · PDF · Screenshot</span>
           </p>
 
           {!isAuthenticated ? (
-            guestScanCount >= 3 ? (
+            guestScanCount >= 1 ? (
               <button
                 type="button"
                 onClick={() => setShowAuthModal(true)}
-                className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/15 border border-amber-500/30 px-2.5 py-0.5 text-[10px] font-mono font-semibold text-amber-300 hover:bg-amber-500/25 transition-all"
+                className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/20 border border-amber-500/40 px-3 py-1 text-[11px] font-mono font-semibold text-amber-300 hover:bg-amber-500/30 transition-all shadow-sm"
               >
-                <LogIn className="w-3 h-3" />
-                <span>Guest Limit Reached • Sign In Free</span>
+                <LogIn className="w-3.5 h-3.5" />
+                <span>Free Scan Used • Sign In</span>
               </button>
             ) : (
               <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 text-[10px] font-mono text-emerald-400">
                 <Sparkles className="w-3 h-3" />
-                {3 - guestScanCount} Free Guest Scans Left
+                1 Free Guest Scan Active
               </span>
             )
           ) : (
@@ -268,7 +290,7 @@ export const HeroScannerCard = ({ onSampleClick }) => {
                   rows={5}
                   value={jobText}
                   onChange={(e) => setJobText(e.target.value)}
-                  placeholder="Paste the full job description here..."
+                  placeholder={t('scanBoxPlaceholder')}
                   maxLength={10000}
                   className="w-full px-4 py-3.5 text-xs sm:text-sm rounded-xl border border-white/10 bg-black/50 text-frost placeholder-fog/60 resize-none focus:outline-none focus:ring-1 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all font-sans leading-relaxed"
                 />
@@ -400,7 +422,7 @@ export const HeroScannerCard = ({ onSampleClick }) => {
                   </span>
                 ) : (
                   <>
-                    <span>Scan Now</span>
+                    <span>{t('analyzeNow')}</span>
                     <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 transition-transform group-hover:translate-x-1" />
                   </>
                 )}
@@ -524,6 +546,9 @@ export const HeroScannerCard = ({ onSampleClick }) => {
         onClose={() => setShowAuthModal(false)}
         onSuccess={() => setShowAuthModal(false)}
       />
+
+      {/* Full Scanning Stage Overlay matching job1.mp4 frame 20 & 25 */}
+      <ScanLoadingOverlay isScanning={isScanning} currentStage={currentStageIdx} />
     </div>
   );
 };

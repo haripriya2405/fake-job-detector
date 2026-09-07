@@ -1,6 +1,25 @@
 import apiClient from './api';
 
 export const analysisService = {
+  // Returns a unique local storage key per user (or guest)
+  getStorageKey() {
+    try {
+      const rawUser = localStorage.getItem('sentinel_user');
+      if (rawUser) {
+        const parsed = JSON.parse(rawUser);
+        if (parsed?.email) {
+          return `sentinel_scan_history_${parsed.email.toLowerCase().trim()}`;
+        }
+        if (parsed?.id) {
+          return `sentinel_scan_history_${parsed.id}`;
+        }
+      }
+    } catch (err) {
+      console.warn('Could not determine user storage key:', err);
+    }
+    return 'sentinel_scan_history_guest';
+  },
+
   async analyzeText(text, metadata = {}) {
     try {
       const response = await apiClient.post('/analysis', {
@@ -10,8 +29,9 @@ export const analysisService = {
         source_type: 'text'
       });
       if (response.data?.id) {
-        const history = JSON.parse(localStorage.getItem('sentinel_scan_history') || '[]');
-        localStorage.setItem('sentinel_scan_history', JSON.stringify([response.data, ...history.filter(h => h.id !== response.data.id)]));
+        const key = this.getStorageKey();
+        const history = JSON.parse(localStorage.getItem(key) || '[]');
+        localStorage.setItem(key, JSON.stringify([response.data, ...history.filter(h => h.id !== response.data.id)]));
         return response.data;
       }
       throw new Error('Analysis response missing ID');
@@ -33,8 +53,9 @@ export const analysisService = {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       if (response.data?.id) {
-        const history = JSON.parse(localStorage.getItem('sentinel_scan_history') || '[]');
-        localStorage.setItem('sentinel_scan_history', JSON.stringify([response.data, ...history.filter(h => h.id !== response.data.id)]));
+        const key = this.getStorageKey();
+        const history = JSON.parse(localStorage.getItem(key) || '[]');
+        localStorage.setItem(key, JSON.stringify([response.data, ...history.filter(h => h.id !== response.data.id)]));
         return response.data;
       }
       throw new Error('Upload analysis response missing ID');
@@ -52,8 +73,9 @@ export const analysisService = {
         company_name: metadata.company_name,
       });
       if (response.data?.id) {
-        const history = JSON.parse(localStorage.getItem('sentinel_scan_history') || '[]');
-        localStorage.setItem('sentinel_scan_history', JSON.stringify([response.data, ...history.filter(h => h.id !== response.data.id)]));
+        const key = this.getStorageKey();
+        const history = JSON.parse(localStorage.getItem(key) || '[]');
+        localStorage.setItem(key, JSON.stringify([response.data, ...history.filter(h => h.id !== response.data.id)]));
         return response.data;
       }
       throw new Error('URL analysis response missing ID');
@@ -70,8 +92,8 @@ export const analysisService = {
         return response.data;
       }
     } catch (err) {
-      // Check locally cached user scan history
-      const history = JSON.parse(localStorage.getItem('sentinel_scan_history') || '[]');
+      const key = this.getStorageKey();
+      const history = JSON.parse(localStorage.getItem(key) || '[]');
       const foundInHistory = history.find((a) => a.id === id);
       if (foundInHistory) return foundInHistory;
       
@@ -79,7 +101,8 @@ export const analysisService = {
       throw new Error(errMsg);
     }
 
-    const history = JSON.parse(localStorage.getItem('sentinel_scan_history') || '[]');
+    const key = this.getStorageKey();
+    const history = JSON.parse(localStorage.getItem(key) || '[]');
     const foundInHistory = history.find((a) => a.id === id);
     if (foundInHistory) return foundInHistory;
 
@@ -97,14 +120,15 @@ export const analysisService = {
       console.warn('Backend history fetch unavailable, retrieving local user history:', err.message);
     }
 
-    const localItems = JSON.parse(localStorage.getItem('sentinel_scan_history') || '[]');
+    const key = this.getStorageKey();
+    const localItems = JSON.parse(localStorage.getItem(key) || '[]');
     const map = new Map();
     
-    // Merge server records
+    // Merge server records for THIS user
     for (const item of serverItems) {
       if (item && item.id) map.set(item.id, item);
     }
-    // Merge locally cached scans (e.g. recent uploads / guest scans)
+    // Merge locally cached scans for THIS user
     for (const item of localItems) {
       if (item && item.id && !map.has(item.id)) {
         map.set(item.id, item);
@@ -115,7 +139,7 @@ export const analysisService = {
       (a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0)
     );
 
-    localStorage.setItem('sentinel_scan_history', JSON.stringify(merged));
+    localStorage.setItem(key, JSON.stringify(merged));
     return merged;
   },
 
@@ -134,9 +158,10 @@ export const analysisService = {
         }))
       });
       if (response.data?.results) {
-        const history = JSON.parse(localStorage.getItem('sentinel_scan_history') || '[]');
+        const key = this.getStorageKey();
+        const history = JSON.parse(localStorage.getItem(key) || '[]');
         const newItems = response.data.results;
-        localStorage.setItem('sentinel_scan_history', JSON.stringify([...newItems, ...history]));
+        localStorage.setItem(key, JSON.stringify([...newItems, ...history]));
         return response.data;
       }
       throw new Error('Batch response missing results');
@@ -172,9 +197,10 @@ export const analysisService = {
       console.warn('Backend delete unavailable, removing locally:', err.message);
     }
 
-    const history = JSON.parse(localStorage.getItem('sentinel_scan_history') || '[]');
+    const key = this.getStorageKey();
+    const history = JSON.parse(localStorage.getItem(key) || '[]');
     const filtered = history.filter((a) => a.id !== id);
-    localStorage.setItem('sentinel_scan_history', JSON.stringify(filtered));
+    localStorage.setItem(key, JSON.stringify(filtered));
     return { success: true };
   },
 

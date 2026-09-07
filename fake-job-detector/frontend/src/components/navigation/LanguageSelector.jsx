@@ -3,7 +3,7 @@ import { ChevronDown, Check } from 'lucide-react';
 import { useLanguage } from '../../hooks/useLanguage';
 
 export const LanguageSelector = ({ variant = 'default' }) => {
-  const { currentLang, changeLanguage, languages } = useLanguage();
+  const { currentLang, changeLanguage, languages, t } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
 
@@ -51,7 +51,7 @@ export const LanguageSelector = ({ variant = 'default' }) => {
           className="absolute right-0 mt-2 w-48 rounded-2xl border border-white/15 bg-[#07100c]/95 backdrop-blur-xl p-1.5 shadow-2xl z-50 animate-in fade-in slide-in-from-top-2 duration-150"
         >
           <div className="px-2.5 py-1 text-[10px] font-mono uppercase tracking-wider text-fog border-b border-white/10 mb-1">
-            Choose Language
+            {t('chooseLanguage')}
           </div>
           {languages.map((lang) => {
             const isSelected = lang.code === currentLang.code;

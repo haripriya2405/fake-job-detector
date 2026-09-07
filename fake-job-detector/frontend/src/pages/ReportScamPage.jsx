@@ -1,31 +1,18 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import {
-  ShieldAlert,
-  AlertTriangle,
-  UploadCloud,
-  CheckCircle2,
-  Send,
-  Building,
-  Briefcase,
-  Globe,
-  FileText,
-  Lock,
-  ArrowLeft
-} from 'lucide-react';
+import { AlertTriangle, Send, CheckCircle2 } from 'lucide-react';
 import { useToast } from '../hooks/useToast';
 
 export const ReportScamPage = () => {
-  const { addToast } = useToast();
+  const { success, error } = useToast();
   const [submitted, setSubmitted] = useState(false);
   const [formData, setFormData] = useState({
     jobTitle: '',
     companyName: '',
-    scamType: 'Fake Recruiter',
-    platform: 'LinkedIn',
-    contactInfo: '',
     description: '',
-    evidenceUrl: ''
+    scamType: '',
+    location: '',
+    jobUrl: '',
   });
 
   const handleChange = (e) => {
@@ -34,51 +21,52 @@ export const ReportScamPage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!formData.jobTitle || !formData.companyName || !formData.description) {
-      addToast('Please fill in all required fields to submit a report.', 'error');
+    if (!formData.jobTitle.trim() || !formData.description.trim() || !formData.scamType) {
+      error('Please fill in all required fields marked with * to submit your report.');
       return;
     }
 
     setSubmitted(true);
-    addToast('Scam report submitted successfully! Thank you for protecting job seekers.', 'success');
+    success('Scam report submitted successfully! Thank you for protecting the community.');
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8 py-4">
-      {/* Back Navigation */}
-      <div className="flex items-center justify-between">
-        <Link to="/scan" className="inline-flex items-center gap-2 text-xs font-medium text-slate-400 hover:text-white transition-colors">
-          <ArrowLeft className="w-4 h-4" />
-          <span>Back to Scam Scanner</span>
-        </Link>
-      </div>
-
-      {/* Header Banner matching PDF Page 11 */}
-      <div className="glass-card rounded-2xl p-6 sm:p-8 border border-red-500/30 bg-gradient-to-r from-red-950/40 via-black to-red-950/20 space-y-3 relative overflow-hidden shadow-2xl">
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-xl bg-red-500/20 border border-red-500/40 flex items-center justify-center text-red-400 shrink-0 shadow-lg">
-            <ShieldAlert className="w-7 h-7" />
+    <div className="max-w-4xl mx-auto space-y-6 py-2 select-none text-frost">
+      
+      {/* 1. Header Section matching Screenshot 1 */}
+      <div className="space-y-4">
+        <div className="flex items-start gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-red-500/10 border border-red-500/30 flex items-center justify-center text-red-500 shrink-0">
+            <AlertTriangle className="w-6 h-6 text-red-500" />
           </div>
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
-              Report a Job Scam
+            <h1 className="text-3xl font-bold text-white tracking-tight">
+              Report a scam
             </h1>
-            <p className="text-xs sm:text-sm text-slate-400 font-light mt-1">
-              Help protect job seekers by reporting fake job listings, fraudulent recruiters, or hiring scams.
+            <p className="text-sm text-slate-400 font-light mt-1">
+              Help protect others by reporting job scams you've encountered
             </p>
           </div>
         </div>
+
+        <p className="text-xs text-slate-400 leading-relaxed font-light">
+          Your report will be reviewed and may appear in our{' '}
+          <Link to="/alerts" className="text-emerald-400 font-medium hover:underline">
+            scam alerts
+          </Link>{' '}
+          to help protect the community. We limit reports to 5 per hour to prevent spam.
+        </p>
       </div>
 
-      {/* Form or Confirmation */}
+      {/* 2. Form Card or Submitted Success Banner */}
       {submitted ? (
-        <div className="glass-card rounded-2xl p-8 border border-emerald-500/30 bg-emerald-950/20 text-center space-y-4 shadow-xl">
-          <div className="w-14 h-14 rounded-full bg-emerald-500/20 border border-emerald-500/40 mx-auto flex items-center justify-center text-emerald-400">
-            <CheckCircle2 className="w-8 h-8" />
+        <div className="p-8 sm:p-10 rounded-3xl bg-[#09110d] border border-emerald-500/30 text-center space-y-4 shadow-2xl">
+          <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 mx-auto flex items-center justify-center text-emerald-400">
+            <CheckCircle2 className="w-8 h-8 text-emerald-400" />
           </div>
-          <h2 className="text-xl font-bold text-white">Scam Report Submitted</h2>
-          <p className="text-xs sm:text-sm text-slate-300 max-w-md mx-auto leading-relaxed">
-            Our intelligence engine and community moderators have received your report. Your contribution helps protect thousands of candidates from fraud.
+          <h2 className="text-2xl font-bold text-white">Scam Report Received</h2>
+          <p className="text-xs sm:text-sm text-slate-300 max-w-lg mx-auto leading-relaxed font-light">
+            Thank you for contributing to the community database. Your submission is being cross-checked against our threat intelligence feeds.
           </p>
           <div className="pt-2">
             <button
@@ -87,173 +75,141 @@ export const ReportScamPage = () => {
                 setFormData({
                   jobTitle: '',
                   companyName: '',
-                  scamType: 'Fake Recruiter',
-                  platform: 'LinkedIn',
-                  contactInfo: '',
                   description: '',
-                  evidenceUrl: ''
+                  scamType: '',
+                  location: '',
+                  jobUrl: '',
                 });
               }}
-              className="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-semibold text-xs transition-all shadow-lg"
+              className="px-6 py-3 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-white font-bold text-xs transition-all shadow-lg shadow-emerald-500/20"
             >
-              Report Another Scam
+              Submit Another Report
             </button>
           </div>
         </div>
       ) : (
-        <form onSubmit={handleSubmit} className="glass-card rounded-2xl p-6 sm:p-8 border border-white/10 space-y-6 shadow-xl">
+        <form onSubmit={handleSubmit} className="p-6 sm:p-8 rounded-3xl bg-[#09110d] border border-white/10 shadow-2xl space-y-6">
           
-          {/* Security Banner */}
-          <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-start gap-3 text-xs text-amber-300">
-            <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
-            <span className="leading-relaxed">
-              <strong>Important Notice:</strong> Do not include sensitive personal info (such as your full credit card number or bank passwords) in your report. Focus on suspicious communication logs, recruiter contacts, and job links.
-            </span>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-            {/* Job Title */}
-            <div className="space-y-2">
-              <label className="text-xs font-semibold text-slate-300 flex items-center gap-2">
-                <Briefcase className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Job Title <span className="text-red-400">*</span></span>
-              </label>
-              <input
-                type="text"
-                name="jobTitle"
-                required
-                value={formData.jobTitle}
-                onChange={handleChange}
-                placeholder="e.g. Remote Data Entry Assistant"
-                className="w-full px-4 py-2.5 rounded-xl bg-black/50 border border-white/15 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500/50"
-              />
-            </div>
-
-            {/* Company Name */}
-            <div className="space-y-2">
-              <label className="text-xs font-semibold text-slate-300 flex items-center gap-2">
-                <Building className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Company Name / Entity <span className="text-red-400">*</span></span>
-              </label>
-              <input
-                type="text"
-                name="companyName"
-                required
-                value={formData.companyName}
-                onChange={handleChange}
-                placeholder="e.g. Apex Global Solutions"
-                className="w-full px-4 py-2.5 rounded-xl bg-black/50 border border-white/15 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500/50"
-              />
-            </div>
-
-            {/* Scam Type */}
-            <div className="space-y-2">
-              <label className="text-xs font-semibold text-slate-300 flex items-center gap-2">
-                <ShieldAlert className="w-3.5 h-3.5 text-red-400" />
-                <span>Category of Fraud</span>
-              </label>
-              <select
-                name="scamType"
-                value={formData.scamType}
-                onChange={handleChange}
-                className="w-full px-4 py-2.5 rounded-xl bg-black/50 border border-white/15 text-xs text-white focus:outline-none focus:border-emerald-500/50"
-              >
-                <option value="Fake Recruiter">Imposter Recruiter / Fake HR</option>
-                <option value="Fee Demand">Payment Required for Training/Equipment</option>
-                <option value="Phishing">Phishing / Personal Identity Theft</option>
-                <option value="Fake Interview">Telegram/WhatsApp Instant Interview</option>
-                <option value="Unrealistic Pay">Unrealistic Compensation Scheme</option>
-              </select>
-            </div>
-
-            {/* Platform / Source */}
-            <div className="space-y-2">
-              <label className="text-xs font-semibold text-slate-300 flex items-center gap-2">
-                <Globe className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Platform / Channel Encountered</span>
-              </label>
-              <select
-                name="platform"
-                value={formData.platform}
-                onChange={handleChange}
-                className="w-full px-4 py-2.5 rounded-xl bg-black/50 border border-white/15 text-xs text-white focus:outline-none focus:border-emerald-500/50"
-              >
-                <option value="LinkedIn">LinkedIn</option>
-                <option value="Indeed">Indeed</option>
-                <option value="WhatsApp">WhatsApp / Telegram</option>
-                <option value="Email">Unsolicited Email</option>
-                <option value="Glassdoor">Glassdoor / ZipRecruiter</option>
-                <option value="Other">Other Job Board / Social Media</option>
-              </select>
-            </div>
-          </div>
-
-          {/* Recruiter Contact Details */}
+          {/* Field 1: Job Title */}
           <div className="space-y-2">
-            <label className="text-xs font-semibold text-slate-300 flex items-center gap-2">
-              <FileText className="w-3.5 h-3.5 text-slate-400" />
-              <span>Recruiter Email / Phone / Handle (Optional)</span>
+            <label className="text-xs font-semibold text-white block">
+              Job title (as shown in the scam) <span className="text-emerald-400">*</span>
             </label>
             <input
               type="text"
-              name="contactInfo"
-              value={formData.contactInfo}
+              name="jobTitle"
+              required
+              value={formData.jobTitle}
               onChange={handleChange}
-              placeholder="e.g. hr-hiring@apex-jobs-careers.com or +1 800..."
-              className="w-full px-4 py-2.5 rounded-xl bg-black/50 border border-white/15 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500/50"
+              placeholder="e.g. Delivery Operations Specialist"
+              className="w-full px-4 py-3.5 rounded-xl bg-black/60 border border-white/10 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500/50 transition-colors"
             />
           </div>
 
-          {/* Scam Details */}
+          {/* Field 2: Company Name */}
           <div className="space-y-2">
-            <label className="text-xs font-semibold text-slate-300 flex items-center gap-2">
-              <FileText className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Detailed Explanation of Scam <span className="text-red-400">*</span></span>
+            <label className="text-xs font-semibold text-white block">
+              Company name or scam description
+            </label>
+            <input
+              type="text"
+              name="companyName"
+              value={formData.companyName}
+              onChange={handleChange}
+              placeholder="e.g. Fake logistics / reshipping scam"
+              className="w-full px-4 py-3.5 rounded-xl bg-black/60 border border-white/10 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500/50 transition-colors"
+            />
+          </div>
+
+          {/* Field 3: What happened? */}
+          <div className="space-y-2">
+            <label className="text-xs font-semibold text-white block">
+              What happened? (describe the scam) <span className="text-emerald-400">*</span>
             </label>
             <textarea
               name="description"
               required
-              rows={4}
+              rows={5}
+              maxLength={2000}
               value={formData.description}
               onChange={handleChange}
-              placeholder="Describe what happened: Did they demand money for background checks? Did they conduct an interview over chat? Were checks issued for laptop purchases?"
-              className="w-full px-4 py-2.5 rounded-xl bg-black/50 border border-white/15 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500/50 resize-y"
+              placeholder="Describe how you encountered this scam, what you were asked to do, etc."
+              className="w-full px-4 py-3.5 rounded-xl bg-black/60 border border-white/10 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500/50 transition-colors resize-y leading-relaxed font-sans"
+            />
+            <div className="text-[11px] font-mono text-slate-500">
+              {formData.description.length}/2000
+            </div>
+          </div>
+
+          {/* Field 4: Type of scam */}
+          <div className="space-y-2">
+            <label className="text-xs font-semibold text-white block">
+              Type of scam <span className="text-emerald-400">*</span>
+            </label>
+            <select
+              name="scamType"
+              required
+              value={formData.scamType}
+              onChange={handleChange}
+              className="w-full px-4 py-3.5 rounded-xl bg-black/60 border border-white/10 text-xs sm:text-sm text-white focus:outline-none focus:border-emerald-500/50 transition-colors"
+            >
+              <option value="" disabled>
+                Select type...
+              </option>
+              <option value="Upfront Fee">Upfront Fee / Registration Demand</option>
+              <option value="Task Scam">Task Scam / YouTube Like & Subscribe</option>
+              <option value="Fake Check">Fake Check / Equipment Deposit</option>
+              <option value="Telegram Interview">Telegram / WhatsApp Only Interview</option>
+              <option value="Phishing">Identity Theft / Phishing Offer Letter</option>
+              <option value="Reshipping">Reshipping / Package Handling</option>
+              <option value="Other">Other / Unspecified Fraud</option>
+            </select>
+          </div>
+
+          {/* Field 5: Location */}
+          <div className="space-y-2">
+            <label className="text-xs font-semibold text-white block">
+              Location (if known)
+            </label>
+            <input
+              type="text"
+              name="location"
+              value={formData.location}
+              onChange={handleChange}
+              placeholder="e.g. Remote (US)"
+              className="w-full px-4 py-3.5 rounded-xl bg-black/60 border border-white/10 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500/50 transition-colors"
             />
           </div>
 
-          {/* Link or Screenshot URL */}
+          {/* Field 6: Job Posting URL */}
           <div className="space-y-2">
-            <label className="text-xs font-semibold text-slate-300 flex items-center gap-2">
-              <UploadCloud className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Job Posting URL or Evidence Link (Optional)</span>
+            <label className="text-xs font-semibold text-white block">
+              Job posting URL (if you have it)
             </label>
             <input
               type="url"
-              name="evidenceUrl"
-              value={formData.evidenceUrl}
+              name="jobUrl"
+              value={formData.jobUrl}
               onChange={handleChange}
               placeholder="https://..."
-              className="w-full px-4 py-2.5 rounded-xl bg-black/50 border border-white/15 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500/50"
+              className="w-full px-4 py-3.5 rounded-xl bg-black/60 border border-white/10 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500/50 transition-colors font-mono"
             />
           </div>
 
-          {/* Submit Button */}
-          <div className="pt-4 flex items-center justify-between">
-            <div className="flex items-center gap-1.5 text-[11px] text-slate-400">
-              <Lock className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Submissions are anonymously processed for threat detection.</span>
-            </div>
-
+          {/* Submit Button matching Screenshot 2 */}
+          <div className="pt-2">
             <button
               type="submit"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs font-semibold shadow-lg shadow-red-950/50 transition-all hover:scale-[1.02] active:scale-[0.98]"
+              className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 active:bg-emerald-600 text-white font-bold text-sm shadow-lg shadow-emerald-500/20 transition-all duration-200"
             >
               <Send className="w-4 h-4" />
-              <span>Submit Scam Report</span>
+              <span>Submit report</span>
             </button>
           </div>
+
         </form>
       )}
+
     </div>
   );
 };

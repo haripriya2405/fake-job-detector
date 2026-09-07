@@ -70,8 +70,10 @@ artifacts/scans/
 tmp/
 temp/
 
-# Large Datasets
+# Large Datasets & Media Frames
 backend/data/*.csv
 backend/data/**/*.csv
 *.csv
+videos/frames/
+videos/frames_full/
 

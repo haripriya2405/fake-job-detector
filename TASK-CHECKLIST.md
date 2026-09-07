@@ -99,9 +99,10 @@
     - [x] `POST /api/v1/analysis/{id}/claim` endpoint to link anonymous guest scans with newly registered or logged-in accounts
     - [x] Interactive guest banner with 1-click Google Sign-in / account claiming on `AnalysisResultPage.jsx`
     - [x] Automated test suite passing: `tests/test_guest_scans_and_claiming.py` (3/3 passed)
-  - [ ] Feature 4: Recruiter Phone VoIP / Carrier Lookup & External Watchlist Feeds (FTC/BBB/IC3)
-  - [ ] Feature 5: "25 Job Scam Red Flags" Interactive Educational Hub & Scam Simulator Game
-  - [ ] Feature 6: Automated Threat Feed Syncing & Global Rate Limiting
+  - [x] Feature 4: Recruiter Phone VoIP / Carrier Lookup & External Watchlist Feeds (FTC/BBB/IC3)
+  - [x] Feature 5: "25 Job Scam Red Flags" Interactive Educational Hub & Scam Simulator Game
+  - [x] Feature 6: Automated Threat Feed Syncing & Global Rate Limiting
+  - [x] Feature 7: Browser Extension Upgrade & Omni-Portal DOM Extractor
 
 
 

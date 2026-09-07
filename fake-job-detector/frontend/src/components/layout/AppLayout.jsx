@@ -3,10 +3,11 @@ import { Outlet } from 'react-router-dom';
 import Navbar from './Navbar';
 import Sidebar from './Sidebar';
 import Footer from './Footer';
+import CookieBanner from '../ui/CookieBanner';
 
 export const AppLayout = ({ showSidebar = false }) => {
   return (
-    <div className="min-h-screen flex flex-col bg-[#050a08] text-frost selection:bg-emerald-500 selection:text-white">
+    <div className="min-h-screen flex flex-col bg-[#050a08] text-frost selection:bg-emerald-500 selection:text-white relative">
       <Navbar />
       <div className="flex-1 flex w-full">
         {showSidebar && <Sidebar />}
@@ -17,6 +18,7 @@ export const AppLayout = ({ showSidebar = false }) => {
         </main>
       </div>
       <Footer />
+      <CookieBanner />
     </div>
   );
 };

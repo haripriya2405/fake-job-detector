@@ -33,6 +33,7 @@ import { DropZone } from '../components/upload/DropZone';
 import { LanguageSelector } from '../components/navigation/LanguageSelector';
 import { analysisService } from '../services/analysisService';
 import { useToast } from '../hooks/useToast';
+import ScanLoadingOverlay from '../components/scanner/ScanLoadingOverlay';
 
 const SCAN_STAGES = [
   'Extracting job text & metadata signals...',
@@ -362,42 +363,71 @@ export const AnalyzeJobPage = () => {
             Paste any job ad and we'll cross-check corporate data, salary norms, recruiter footprint, and known scam fingerprints.
           </p>
 
-          {/* 3 Stats Pill */}
-          <div className="inline-flex flex-wrap items-center gap-3 sm:gap-6 rounded-2xl bg-black/40 border border-white/10 px-4 py-2 text-xs text-mist font-mono">
-            <span className="flex items-center gap-1.5 text-amber-400">
+          {/* Top Floating Toast Alert matching job1.mp4 */}
+          {!isAuthenticated && guestScanCount >= 1 && (
+            <div className="animate-in slide-in-from-top-4 duration-300">
+              <div className="flex items-center justify-between gap-3 p-3.5 rounded-xl bg-gradient-to-r from-red-950/80 via-red-900/50 to-red-950/80 border border-red-500/50 text-red-200 shadow-xl shadow-red-500/10 text-xs">
+                <div className="flex items-center gap-2.5 font-medium">
+                  <AlertTriangle className="w-4 h-4 text-red-400 shrink-0 animate-pulse" />
+                  <span>⚠️ You've used your free scan for this device. Create a free account to scan more jobs.</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowAuthModal(true)}
+                  className="px-3.5 py-1.5 rounded-lg bg-red-500 hover:bg-red-400 text-white font-semibold text-xs shrink-0 transition-all shadow-md"
+                >
+                  Create Free Account
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* 3 Stats Pill matching job1.mp4 */}
+          <div className="inline-flex flex-wrap items-center gap-3 sm:gap-6 rounded-2xl bg-black/50 border border-white/10 px-4 py-2 text-xs text-mist font-mono shadow-inner">
+            <span className="flex items-center gap-1.5 text-amber-400 hover:scale-105 transition-transform cursor-default">
               <AlertTriangle className="w-3.5 h-3.5" />
-              <span>60% of scans flagged risky</span>
+              <span>61% of scans flagged risky</span>
             </span>
             <span className="hidden sm:inline text-white/20">|</span>
-            <span className="flex items-center gap-1.5 text-emerald-400">
+            <span className="flex items-center gap-1.5 text-emerald-400 hover:scale-105 transition-transform cursor-default">
               <ShieldCheck className="w-3.5 h-3.5" />
               <span>50+ verification checks</span>
             </span>
             <span className="hidden sm:inline text-white/20">|</span>
-            <span className="flex items-center gap-1.5 text-frost">
+            <span className="flex items-center gap-1.5 text-frost hover:scale-105 transition-transform cursor-default">
               <Sparkles className="w-3.5 h-3.5 text-skywash" />
               <span>Avg. ~60 sec per scan</span>
             </span>
           </div>
 
-          {/* Quota Banner */}
-          <div className="rounded-xl bg-white/[0.03] border border-white/10 px-4 py-2.5 text-xs text-fog font-light">
-            {!isAuthenticated ? (
-              guestScanCount >= 1 ? (
-                <span className="text-amber-300">
-                  1 free scan used. <button type="button" onClick={() => setShowAuthModal(true)} className="text-emerald-400 underline underline-offset-2 font-medium">Sign in with Google or Email</button> to unlock unlimited scans & save history.
-                </span>
-              ) : (
+          {/* Red Quota Limit Warning Banner */}
+          {!isAuthenticated && guestScanCount >= 1 ? (
+            <div className="rounded-xl bg-red-950/30 border border-red-500/40 p-3.5 text-xs text-red-300 flex items-center justify-between gap-3 animate-pulse">
+              <div className="flex items-center gap-2">
+                <ShieldAlert className="w-4 h-4 text-red-400 shrink-0" />
+                <span>Free scan limit reached for this device. Create a free account to scan more jobs.</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowAuthModal(true)}
+                className="text-emerald-400 underline underline-offset-2 font-medium shrink-0 hover:text-emerald-300"
+              >
+                Sign In Free →
+              </button>
+            </div>
+          ) : (
+            <div className="rounded-xl bg-white/[0.03] border border-white/10 px-4 py-2.5 text-xs text-fog font-light">
+              {!isAuthenticated ? (
                 <span>
                   1 free scan per device. <button type="button" onClick={() => setShowAuthModal(true)} className="text-emerald-400 underline underline-offset-2 font-medium">Sign in</button> to unlock unlimited scans & history vault.
                 </span>
-              )
-            ) : (
-              <span className="text-emerald-400 font-mono text-[11px]">
-                ✓ Unlimited scans enabled for logged-in analyst account.
-              </span>
-            )}
-          </div>
+              ) : (
+                <span className="text-emerald-400 font-mono text-[11px]">
+                  ✓ Unlimited scans enabled for logged-in analyst account.
+                </span>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Main Grid: Left Form Card (7 cols) + Right Sidebar (5 cols) matching Page 6 & 7 */}
@@ -1020,6 +1050,8 @@ export const AnalyzeJobPage = () => {
         onClose={() => setShowAuthModal(false)}
         onSuccess={() => setShowAuthModal(false)}
       />
+      {/* Scanning Stage Overlay matching job1.mp4 frame 20 & 25 */}
+      <ScanLoadingOverlay isScanning={isAnalyzing} currentStage={stageIdx} />
     </div>
   );
 };

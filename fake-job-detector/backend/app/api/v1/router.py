@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from app.api.v1 import analysis, auth, community, health, verification_certificate, educational
+from app.api.v1 import analysis, auth, community, educational, health, verification_certificate
 
 api_v1_router = APIRouter()
 

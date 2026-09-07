@@ -5,6 +5,7 @@ import { GoogleLogin } from '@react-oauth/google';
 import { useAuth } from '../hooks/useAuth';
 import { useToast } from '../hooks/useToast';
 import { LanguageSelector } from '../components/navigation/LanguageSelector';
+import OnboardingSurveyModal from '../components/auth/OnboardingSurveyModal';
 
 export const RegisterPage = () => {
   const [fullName, setFullName] = useState('');
@@ -12,6 +13,7 @@ export const RegisterPage = () => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showSurvey, setShowSurvey] = useState(false);
 
   const { register, loginWithGoogle } = useAuth();
   const { success } = useToast();
@@ -31,14 +33,13 @@ export const RegisterPage = () => {
       setError('');
       const loggedUser = await loginWithGoogle(idToken);
       success(`Welcome ${loggedUser?.full_name || 'to SentinelJob AI'}! Account authenticated via Google.`);
-      navigate('/dashboard');
+      setShowSurvey(true);
     } catch (err) {
       setError(err.message || 'Google registration failed.');
     } finally {
       setLoading(false);
     }
   };
-
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -48,12 +49,16 @@ export const RegisterPage = () => {
     try {
       await register(fullName, email, password);
       success('Account created successfully. Welcome to SentinelJob AI.');
-      navigate('/dashboard');
+      setShowSurvey(true);
     } catch (err) {
       setError(err.message || 'Registration failed. Please try again.');
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSurveyComplete = () => {
+    navigate('/dashboard');
   };
 
 
@@ -195,10 +200,12 @@ export const RegisterPage = () => {
         </div>
       </div>
 
-      {/* Footer */}
-      <div className="max-w-md w-full mx-auto text-center text-[10px] text-fog py-2 relative z-10 font-light">
-        Protected by SentinelJob AI 8-Layer Signal Intelligence
-      </div>
+      {/* Onboarding Survey Modal matching job1.mp4 */}
+      <OnboardingSurveyModal
+        isOpen={showSurvey}
+        onClose={() => navigate('/dashboard')}
+        onComplete={handleSurveyComplete}
+      />
     </div>
   );
 };

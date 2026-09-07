@@ -587,6 +587,16 @@ class AnalysisService:
         except ValueError as ve:
             raise FileUploadError(detail=str(ve))
 
+        # Perform PDF Document Forensics if file is PDF
+        if st_normalized == "PDF":
+            try:
+                from app.verification.pdf_forensics import pdf_forensics_inspector
+                pdf_res = pdf_forensics_inspector.inspect_pdf(file_bytes, filename=file.filename or "offer_letter.pdf")
+                if pdf_res.get("extracted_text") and not normalized.cleaned_text:
+                    normalized.cleaned_text = pdf_res["extracted_text"]
+            except Exception as pe:
+                logger.warning(f"PDF forensic inspector notice: {pe}")
+
         return self.create_analysis_from_normalized(normalized, current_user=current_user)
 
     def create_url_analysis(
@@ -627,6 +637,8 @@ class AnalysisService:
         query = self.db.query(Analysis)
         if current_user:
             query = query.filter(Analysis.user_id == current_user.id)
+        else:
+            query = query.filter(Analysis.user_id.is_(None))
         records = query.order_by(Analysis.created_at.desc()).offset(offset).limit(limit).all()
         return [
             AnalysisHistoryItem(

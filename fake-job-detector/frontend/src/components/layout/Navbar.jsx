@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { ShieldCheck, User, LogOut, Menu, X, Shield, History } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
+import { useLanguage } from '../../hooks/useLanguage';
 import { LanguageSelector } from '../navigation/LanguageSelector';
 import { TopAdvisoryBar } from '../navigation/TopAdvisoryBar';
 
 export const Navbar = () => {
   const { user, isAuthenticated, logout } = useAuth();
+  const { t } = useLanguage();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const navigate = useNavigate();
@@ -46,7 +48,7 @@ export const Navbar = () => {
                 isActive('/analyze') || isActive('/scan') ? 'text-frost font-semibold' : ''
               }`}
             >
-              Job Scam Checker
+              {t('jobScamChecker')}
             </Link>
 
             <Link
@@ -55,7 +57,7 @@ export const Navbar = () => {
                 isActive('/database') || isActive('/scams') ? 'text-frost font-semibold' : ''
               }`}
             >
-              Scam Database
+              {t('scamDatabase')}
             </Link>
 
             <Link
@@ -64,7 +66,7 @@ export const Navbar = () => {
                 isActive('/guides/job-scam-red-flags') ? 'text-frost font-semibold' : ''
               }`}
             >
-              Red Flags Guide
+              {t('redFlagsGuide')}
             </Link>
 
             <Link
@@ -73,9 +75,9 @@ export const Navbar = () => {
                 isActive('/simulator') || isActive('/game') ? 'text-frost font-semibold' : ''
               }`}
             >
-              <span>Scam Simulator</span>
+              <span>{t('scamSimulator')}</span>
               <span className="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-bold border border-emerald-500/30">
-                Game
+                {t('gameBadge')}
               </span>
             </Link>
           </div>
@@ -108,7 +110,7 @@ export const Navbar = () => {
                       className="flex items-center gap-2 px-3 py-2 text-xs text-mist hover:text-frost hover:bg-white/5 rounded-xl mt-1"
                     >
                       <Shield className="w-3.5 h-3.5 text-emerald-400" />
-                      Dashboard
+                      {t('dashboard')}
                     </Link>
                     <Link
                       to="/history"
@@ -116,7 +118,7 @@ export const Navbar = () => {
                       className="flex items-center gap-2 px-3 py-2 text-xs text-mist hover:text-frost hover:bg-white/5 rounded-xl"
                     >
                       <History className="w-3.5 h-3.5 text-emerald-400" />
-                      Scan History & Vault
+                      {t('scanHistory')}
                     </Link>
                     <Link
                       to="/settings"
@@ -124,7 +126,7 @@ export const Navbar = () => {
                       className="flex items-center gap-2 px-3 py-2 text-xs text-mist hover:text-frost hover:bg-white/5 rounded-xl"
                     >
                       <User className="w-3.5 h-3.5 text-skywash" />
-                      Settings & API
+                      {t('settings')}
                     </Link>
                     <div className="border-t border-white/10 my-1" />
                     <button
@@ -132,7 +134,7 @@ export const Navbar = () => {
                       className="flex items-center gap-2 w-full px-3 py-2 text-xs text-danger-bright hover:bg-danger/10 rounded-xl transition-colors"
                     >
                       <LogOut className="w-3.5 h-3.5" />
-                      Sign Out
+                      {t('signOut')}
                     </button>
                   </div>
                 )}
@@ -143,13 +145,13 @@ export const Navbar = () => {
                   to="/login"
                   className="text-xs font-medium text-fog hover:text-frost px-3 py-1.5 rounded-full transition-colors"
                 >
-                  Sign In
+                  {t('signIn')}
                 </Link>
                 <Link
                   to="/register"
                   className="text-xs font-semibold text-white bg-emerald-500 hover:bg-emerald-400 px-3.5 py-1.5 rounded-full shadow-sm hover:shadow-emerald-glow transition-all"
                 >
-                  Get Started
+                  {t('getStarted')}
                 </Link>
               </div>
             )}
