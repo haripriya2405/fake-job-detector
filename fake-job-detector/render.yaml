@@ -32,6 +32,6 @@ databases:
   # Render PostgreSQL Database
   - name: sentineljob-db
     databaseName: fake_job_detector
-    user: postgres
+    user: sentinel_user
     plan: free
     region: oregon
