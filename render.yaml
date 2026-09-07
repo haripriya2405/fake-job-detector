@@ -6,7 +6,8 @@ services:
   - type: web
     name: sentineljob-backend
     env: docker
-    dockerfilePath: fake-job-detector/docker/backend/Dockerfile
+    dockerContext: fake-job-detector
+    dockerfilePath: docker/backend/Dockerfile
     plan: free
     region: oregon
     healthCheckPath: /health
