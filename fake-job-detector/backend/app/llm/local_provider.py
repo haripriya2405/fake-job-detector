@@ -26,9 +26,9 @@ class LocalLLMProvider(BaseLLMProvider):
 
     def __init__(
         self,
-        model_name: str = "llama3.2:latest",
+        model_name: str = "qwen2.5:7b",
         endpoint_url: Optional[str] = None,
-        timeout_seconds: float = 20.0,
+        timeout_seconds: float = 45.0,
     ):
         self.endpoint_url = endpoint_url or os.getenv("LOCAL_LLM_URL", "http://localhost:11434/v1/chat/completions")
         super().__init__(model_name=model_name, api_key=None, timeout_seconds=timeout_seconds)

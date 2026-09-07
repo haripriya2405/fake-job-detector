@@ -77,6 +77,7 @@ class MultiModalExtractionSchema(BaseModel):
 
 class SalaryBenchmarkSchema(BaseModel):
     detected_salary_text: Optional[str] = None
+    currency: str = "USD"
     min_amount: Optional[float] = None
     max_amount: Optional[float] = None
     frequency: Optional[str] = None
@@ -86,7 +87,7 @@ class SalaryBenchmarkSchema(BaseModel):
     market_median_annual: float = 60000.0
     market_p25_annual: float = 42000.0
     market_p90_annual: float = 110000.0
-    market_p90_hourly: float = 52.88
+    market_p90_hourly: Optional[float] = None
     discrepancy_ratio: float = 1.0
     is_unrealistic_high: bool = False
     is_unrealistic_low: bool = False
