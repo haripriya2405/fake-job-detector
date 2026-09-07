@@ -110,7 +110,7 @@
     "adversarial_metrics": {},
     "latency_metrics": {},
     "artifact_hash": "test_hash_123",
-    "created_at": "2026-09-06T17:35:34.799254+00:00",
+    "created_at": "2026-09-07T02:37:13.575430+00:00",
     "evaluated_at": null,
     "promotion_status": "NOT_EVALUATED",
     "rejection_reason": null,
