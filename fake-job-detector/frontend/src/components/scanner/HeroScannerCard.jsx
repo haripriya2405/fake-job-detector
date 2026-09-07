@@ -292,7 +292,7 @@ export const HeroScannerCard = ({ onSampleClick }) => {
                   onChange={(e) => setJobText(e.target.value)}
                   placeholder={t('scanBoxPlaceholder')}
                   maxLength={10000}
-                  className="w-full px-4 py-3.5 text-xs sm:text-sm rounded-xl border border-white/10 bg-black/50 text-frost placeholder-fog/60 resize-none focus:outline-none focus:ring-1 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all font-sans leading-relaxed"
+                  className="w-full px-4 py-3.5 text-base sm:text-sm rounded-xl border border-white/10 bg-black/50 text-frost placeholder-fog/60 resize-none focus:outline-none focus:ring-1 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all font-sans leading-relaxed"
                 />
               </div>
 

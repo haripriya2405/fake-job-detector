@@ -178,56 +178,56 @@ export const Navbar = () => {
               <Link
                 to="/"
                 onClick={() => setMobileMenuOpen(false)}
-                className="px-3 py-2 rounded-xl text-xs text-mist hover:text-frost hover:bg-white/5"
+                className="px-3.5 py-2.5 rounded-xl text-sm font-medium text-mist hover:text-frost hover:bg-white/5 transition-colors flex items-center min-h-[44px]"
               >
                 Overview
               </Link>
               <Link
                 to="/analyze"
                 onClick={() => setMobileMenuOpen(false)}
-                className="px-3 py-2 rounded-xl text-xs text-mist hover:text-frost hover:bg-white/5"
+                className="px-3.5 py-2.5 rounded-xl text-sm font-medium text-mist hover:text-frost hover:bg-white/5 transition-colors flex items-center min-h-[44px]"
               >
                 Job Scam Checker
               </Link>
               <Link
                 to="/database"
                 onClick={() => setMobileMenuOpen(false)}
-                className="px-3 py-2 rounded-xl text-xs text-mist hover:text-frost hover:bg-white/5"
+                className="px-3.5 py-2.5 rounded-xl text-sm font-medium text-mist hover:text-frost hover:bg-white/5 transition-colors flex items-center min-h-[44px]"
               >
                 Scam Database
               </Link>
               <Link
                 to="/guides/job-scam-red-flags"
                 onClick={() => setMobileMenuOpen(false)}
-                className="px-3 py-2 rounded-xl text-xs text-mist hover:text-frost hover:bg-white/5"
+                className="px-3.5 py-2.5 rounded-xl text-sm font-medium text-mist hover:text-frost hover:bg-white/5 transition-colors flex items-center min-h-[44px]"
               >
                 Red Flags Guide
               </Link>
               <Link
                 to="/simulator"
                 onClick={() => setMobileMenuOpen(false)}
-                className="px-3 py-2 rounded-xl text-xs text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10 font-semibold"
+                className="px-3.5 py-2.5 rounded-xl text-sm font-semibold text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10 transition-colors flex items-center min-h-[44px]"
               >
                 🎮 Scam Hunter Simulator
               </Link>
               <Link
                 to="/dashboard"
                 onClick={() => setMobileMenuOpen(false)}
-                className="px-3 py-2 rounded-xl text-xs text-mist hover:text-frost hover:bg-white/5"
+                className="px-3.5 py-2.5 rounded-xl text-sm font-medium text-mist hover:text-frost hover:bg-white/5 transition-colors flex items-center min-h-[44px]"
               >
                 Threat Dashboard
               </Link>
               <Link
                 to="/history"
                 onClick={() => setMobileMenuOpen(false)}
-                className="px-3 py-2 rounded-xl text-xs text-mist hover:text-frost hover:bg-white/5"
+                className="px-3.5 py-2.5 rounded-xl text-sm font-medium text-mist hover:text-frost hover:bg-white/5 transition-colors flex items-center min-h-[44px]"
               >
                 Scan Vault
               </Link>
               <Link
                 to="/settings"
                 onClick={() => setMobileMenuOpen(false)}
-                className="px-3 py-2 rounded-xl text-xs text-mist hover:text-frost hover:bg-white/5"
+                className="px-3.5 py-2.5 rounded-xl text-sm font-medium text-mist hover:text-frost hover:bg-white/5 transition-colors flex items-center min-h-[44px]"
               >
                 Settings
               </Link>

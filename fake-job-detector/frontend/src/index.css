@@ -31,6 +31,9 @@
     overflow-x: hidden;
     selection-background-color: #10B981;
     selection-color: #ffffff;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    -webkit-overflow-scrolling: touch;
   }
 
   ::selection {
