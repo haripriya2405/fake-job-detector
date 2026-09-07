@@ -1,6 +1,6 @@
 import uuid
 from typing import List, Optional, TYPE_CHECKING
-from sqlalchemy import Float, ForeignKey, Integer, String, Text
+from sqlalchemy import Float, ForeignKey, Index, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.db.base import Base, GUID, TimestampMixin
 
@@ -13,6 +13,10 @@ if TYPE_CHECKING:
 
 class Analysis(Base, TimestampMixin):
     __tablename__ = "analyses"
+    __table_args__ = (
+        Index("idx_analyses_user_created", "user_id", "created_at"),
+        Index("idx_analyses_risk_created", "risk_score", "created_at"),
+    )
 
     id: Mapped[uuid.UUID] = mapped_column(
         GUID,

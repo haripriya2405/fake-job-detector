@@ -1,12 +1,16 @@
 import uuid
 from typing import Optional
-from sqlalchemy import Boolean, Integer, String, Text
+from sqlalchemy import Boolean, Index, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 from app.db.base import Base, GUID, TimestampMixin
 
 
 class CommunityScam(Base, TimestampMixin):
     __tablename__ = "community_scams"
+    __table_args__ = (
+        Index("idx_scams_cat_confirm", "scam_category", "community_confirmations"),
+        Index("idx_scams_risk_created", "risk_score", "created_at"),
+    )
 
     id: Mapped[uuid.UUID] = mapped_column(
         GUID,
