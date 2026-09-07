@@ -629,6 +629,28 @@ export const AnalyzeJobPage = () => {
                 )}
               </div>
 
+              {/* Animated Radar Progress Bar during analysis */}
+              {isAnalyzing && (
+                <div className="p-4 rounded-xl bg-black/70 border border-emerald-500/40 space-y-2.5 shadow-lg shadow-emerald-500/10 animate-fadeIn">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="flex items-center gap-2 font-mono text-emerald-400 font-semibold">
+                      <span className="relative flex h-2.5 w-2.5">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                      </span>
+                      <span>{SCAN_STAGES[stageIdx % SCAN_STAGES.length]}</span>
+                    </span>
+                    <span className="text-[10px] font-mono text-fog uppercase tracking-wider">13-Stage Pipeline Active</span>
+                  </div>
+                  <div className="w-full bg-white/10 rounded-full h-1.5 overflow-hidden">
+                    <div
+                      className="bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-400 h-1.5 rounded-full transition-all duration-300"
+                      style={{ width: `${Math.min(95, ((stageIdx + 1) / SCAN_STAGES.length) * 100)}%` }}
+                    />
+                  </div>
+                </div>
+              )}
+
               {/* Submit CTA */}
               <div className="space-y-2 pt-2">
                 {!isAuthenticated && guestScanCount >= 1 ? (
@@ -649,7 +671,7 @@ export const AnalyzeJobPage = () => {
                     {isAnalyzing ? (
                       <span className="flex items-center gap-2">
                         <span className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
-                        <span>Analyzing Posting...</span>
+                        <span>Analyzing with SentinelJob AI Engine...</span>
                       </span>
                     ) : (
                       <>
