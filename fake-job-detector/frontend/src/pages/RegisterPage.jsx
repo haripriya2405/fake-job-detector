@@ -48,17 +48,7 @@ export const RegisterPage = () => {
     try {
       setLoading(true);
       setError('');
-      const demoEmail = `google.user.${Math.floor(1000 + Math.random() * 9000)}@gmail.com`;
-      const demoPass = 'GoogleAuthDemo2026!';
-      const demoName = 'Google Analyst';
-
-      let loggedUser;
-      try {
-        loggedUser = await register(demoName, demoEmail, demoPass);
-      } catch {
-        loggedUser = await login(demoEmail, demoPass);
-      }
-
+      const loggedUser = await loginWithGoogle('demo_google_token:google.analyst@gmail.com:Google Analyst');
       success(`Welcome ${loggedUser?.full_name || 'Google Analyst'}! Account authenticated via Google.`);
       setShowSurvey(true);
     } catch (err) {

@@ -42,26 +42,18 @@ export const GoogleAuthModal = ({ isOpen, onClose, onSuccess }) => {
     }
   };
 
-  const handleDemoGoogleLogin = async () => {
+  const handleDemoGoogleLogin = async (customEmail = null) => {
     setIsLoading(true);
     try {
-      const demoEmail = `google.user.${Math.floor(1000 + Math.random() * 9000)}@gmail.com`;
-      const demoPass = 'GoogleAuthDemo2026!';
-      const demoName = 'Google Analyst';
-
-      let user;
-      try {
-        user = await register(demoName, demoEmail, demoPass);
-      } catch {
-        user = await login(demoEmail, demoPass);
-      }
+      const targetEmail = customEmail || email || 'google.analyst@gmail.com';
+      const loggedUser = await loginWithGoogle(`demo_google_token:${targetEmail}:Google Analyst`);
       
-      success(`Welcome ${user?.full_name || 'Google Analyst'}! Authenticated via Google.`);
+      success(`Welcome ${loggedUser?.full_name || 'Google Analyst'}! Authenticated via Google.`);
       if (onSuccess) onSuccess();
       if (onClose) onClose();
       navigate('/dashboard');
     } catch (err) {
-      error(err.message || 'Google authentication simulation failed.');
+      error(err.message || 'Google authentication failed.');
     } finally {
       setIsLoading(false);
     }
