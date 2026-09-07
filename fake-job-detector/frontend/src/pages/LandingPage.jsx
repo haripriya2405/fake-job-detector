@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { ArrowRight, ShieldCheck, Sparkles, User, History, LayoutDashboard } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -12,6 +12,12 @@ import { BottomCtaBanner } from '../components/home/BottomCtaBanner';
 export const LandingPage = () => {
   const navigate = useNavigate();
   const { isAuthenticated, user } = useAuth();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleSelectSample = (sample) => {
     navigate(`/analysis/${sample.id}`, { state: { samplePreset: sample } });
