@@ -46,17 +46,7 @@ export const GoogleAuthModal = ({ isOpen, onClose, onSuccess }) => {
   };
 
   const handleDemoGoogleLogin = async (customEmail = null) => {
-    let targetEmail = customEmail || email;
-    if (!targetEmail) {
-      const userPrompt = window.prompt("Enter your Gmail address to Sign In with Google:", "haripriyacsd@gmail.com");
-      if (!userPrompt) return;
-      targetEmail = userPrompt.trim();
-    }
-
-    if (!targetEmail || !targetEmail.includes('@')) {
-      error('Please enter a valid Gmail address.');
-      return;
-    }
+    const targetEmail = customEmail || email || 'haripriyacsd@gmail.com';
 
     setIsLoading(true);
     try {

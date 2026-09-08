@@ -45,17 +45,7 @@ export const LoginPage = () => {
   };
 
   const handleDemoGoogleLogin = async (customEmail = null) => {
-    let targetEmail = customEmail || email;
-    if (!targetEmail) {
-      const userPrompt = window.prompt("Enter your Gmail address to Sign In with Google:", "haripriyacsd@gmail.com");
-      if (!userPrompt) return;
-      targetEmail = userPrompt.trim();
-    }
-
-    if (!targetEmail || !targetEmail.includes('@')) {
-      setError('Please enter a valid Gmail address.');
-      return;
-    }
+    const targetEmail = customEmail || email || 'haripriyacsd@gmail.com';
 
     try {
       setLoading(true);
