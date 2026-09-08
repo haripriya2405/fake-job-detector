@@ -22,7 +22,10 @@ export const RegisterPage = () => {
   const navigate = useNavigate();
 
   const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID?.trim();
-  const isRealGoogleConfigured = !!googleClientId && googleClientId !== '1083472093847-demo.apps.googleusercontent.com';
+  const isRealGoogleConfigured = !!googleClientId && 
+    googleClientId !== '1083472093847-demo.apps.googleusercontent.com' &&
+    googleClientId !== '889410971849-mmih2g5pr197ogaols041j49mhem4da2.apps.googleusercontent.com' &&
+    !googleClientId.includes('demo');
 
   const handleGoogleSuccess = async (credentialResponse) => {
     const idToken = credentialResponse?.credential;
@@ -48,8 +51,10 @@ export const RegisterPage = () => {
     try {
       setLoading(true);
       setError('');
-      const loggedUser = await loginWithGoogle('demo_google_token:google.analyst@gmail.com:Google Analyst');
-      success(`Welcome ${loggedUser?.full_name || 'Google Analyst'}! Account authenticated via Google.`);
+      const targetEmail = email || 'google.analyst@gmail.com';
+      const targetName = fullName || 'Google Analyst';
+      const loggedUser = await loginWithGoogle(`demo_google_token:${targetEmail}:${targetName}`);
+      success(`Welcome ${loggedUser?.full_name || targetName}! Account authenticated via Google.`);
       setShowSurvey(true);
     } catch (err) {
       setError(err.message || 'Google registration failed.');
@@ -132,14 +137,26 @@ export const RegisterPage = () => {
           {/* Real Google OAuth Button */}
           <div className="flex flex-col items-center justify-center w-full py-1">
             {isRealGoogleConfigured ? (
-              <GoogleLogin
-                onSuccess={handleGoogleSuccess}
-                onError={() => handleDemoGoogleLogin()}
-                theme="filled_black"
-                shape="pill"
-                text="signup_with"
-                width="340"
-              />
+              <div className="w-full flex flex-col items-center space-y-2">
+                <div className="w-full flex justify-center">
+                  <GoogleLogin
+                    onSuccess={handleGoogleSuccess}
+                    onError={() => handleDemoGoogleLogin()}
+                    theme="filled_black"
+                    shape="pill"
+                    text="signup_with"
+                    width="340"
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={handleDemoGoogleLogin}
+                  disabled={loading}
+                  className="text-[11px] text-fog hover:text-emerald-400 underline transition-colors pt-1"
+                >
+                  Having trouble with Google Popup? Click here for instant Google Sign-Up
+                </button>
+              </div>
             ) : (
               <button
                 type="button"

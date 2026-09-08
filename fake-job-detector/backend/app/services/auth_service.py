@@ -27,7 +27,10 @@ def verify_google_id_token(token: str) -> dict:
     if token.startswith("demo_google_token:") or token.startswith("demo_"):
         parts = token.split(":")
         email = parts[1] if len(parts) > 1 and "@" in parts[1] else "google.analyst@gmail.com"
-        name = parts[2] if len(parts) > 2 else "Google Analyst"
+        name = parts[2] if len(parts) > 2 and parts[2].strip() else None
+        if not name:
+            email_prefix = email.split("@")[0]
+            name = email_prefix.replace(".", " ").replace("_", " ").title()
         return {
             "email": email,
             "name": name,

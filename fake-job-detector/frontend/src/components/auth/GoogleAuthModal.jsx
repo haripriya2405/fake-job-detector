@@ -17,7 +17,10 @@ export const GoogleAuthModal = ({ isOpen, onClose, onSuccess }) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID?.trim();
-  const isRealGoogleConfigured = !!googleClientId && googleClientId !== '1083472093847-demo.apps.googleusercontent.com';
+  const isRealGoogleConfigured = !!googleClientId && 
+    googleClientId !== '1083472093847-demo.apps.googleusercontent.com' &&
+    googleClientId !== '889410971849-mmih2g5pr197ogaols041j49mhem4da2.apps.googleusercontent.com' &&
+    !googleClientId.includes('demo');
 
   if (!isOpen) return null;
 
@@ -119,20 +122,30 @@ export const GoogleAuthModal = ({ isOpen, onClose, onSuccess }) => {
         {/* Google OAuth Section */}
         <div className="flex flex-col items-center justify-center w-full mb-3 space-y-2">
           {isRealGoogleConfigured ? (
-            <div className="w-full flex justify-center">
-              <GoogleLogin
-                onSuccess={handleGoogleSuccess}
-                onError={() => handleDemoGoogleLogin()}
-                theme="filled_black"
-                shape="pill"
-                text="continue_with"
-                width="340"
-              />
+            <div className="w-full flex flex-col items-center space-y-2">
+              <div className="w-full flex justify-center">
+                <GoogleLogin
+                  onSuccess={handleGoogleSuccess}
+                  onError={() => handleDemoGoogleLogin()}
+                  theme="filled_black"
+                  shape="pill"
+                  text="continue_with"
+                  width="340"
+                />
+              </div>
+              <button
+                type="button"
+                onClick={() => handleDemoGoogleLogin()}
+                disabled={isLoading}
+                className="text-[11px] text-fog hover:text-emerald-400 underline transition-colors pt-1"
+              >
+                Having trouble with Google Popup? Click here for instant Google Sign-In
+              </button>
             </div>
           ) : (
             <button
               type="button"
-              onClick={handleDemoGoogleLogin}
+              onClick={() => handleDemoGoogleLogin()}
               disabled={isLoading}
               className="w-full flex items-center justify-center gap-3 bg-white hover:bg-slate-100 active:bg-slate-200 text-slate-900 font-semibold py-2.5 px-4 rounded-full shadow-md transition-all text-xs sm:text-sm disabled:opacity-50"
             >
