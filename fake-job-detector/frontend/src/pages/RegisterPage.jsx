@@ -47,12 +47,24 @@ export const RegisterPage = () => {
     }
   };
 
-  const handleDemoGoogleLogin = async () => {
+  const handleDemoGoogleLogin = async (customEmail = null) => {
+    let targetEmail = customEmail || email;
+    if (!targetEmail) {
+      const userPrompt = window.prompt("Enter your Gmail address to Sign Up with Google:", "haripriyacsd@gmail.com");
+      if (!userPrompt) return;
+      targetEmail = userPrompt.trim();
+    }
+
+    if (!targetEmail || !targetEmail.includes('@')) {
+      setError('Please enter a valid Gmail address.');
+      return;
+    }
+
     try {
       setLoading(true);
       setError('');
-      const targetEmail = email || 'google.analyst@gmail.com';
-      const targetName = fullName || 'Google Analyst';
+      const emailPrefix = targetEmail.split('@')[0].replace(/[._-]/g, ' ');
+      const targetName = fullName || (emailPrefix.charAt(0).toUpperCase() + emailPrefix.slice(1));
       const loggedUser = await loginWithGoogle(`demo_google_token:${targetEmail}:${targetName}`);
       success(`Welcome ${loggedUser?.full_name || targetName}! Account authenticated via Google.`);
       setShowSurvey(true);

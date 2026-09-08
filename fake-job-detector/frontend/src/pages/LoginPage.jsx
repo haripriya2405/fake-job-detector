@@ -44,13 +44,26 @@ export const LoginPage = () => {
     }
   };
 
-  const handleDemoGoogleLogin = async () => {
+  const handleDemoGoogleLogin = async (customEmail = null) => {
+    let targetEmail = customEmail || email;
+    if (!targetEmail) {
+      const userPrompt = window.prompt("Enter your Gmail address to Sign In with Google:", "haripriyacsd@gmail.com");
+      if (!userPrompt) return;
+      targetEmail = userPrompt.trim();
+    }
+
+    if (!targetEmail || !targetEmail.includes('@')) {
+      setError('Please enter a valid Gmail address.');
+      return;
+    }
+
     try {
       setLoading(true);
       setError('');
-      const targetEmail = email || 'google.analyst@gmail.com';
-      const loggedUser = await loginWithGoogle(`demo_google_token:${targetEmail}:Google Analyst`);
-      success(`Welcome ${loggedUser?.full_name || 'Google Analyst'}! Authenticated via Google.`);
+      const emailPrefix = targetEmail.split('@')[0].replace(/[._-]/g, ' ');
+      const formattedName = emailPrefix.charAt(0).toUpperCase() + emailPrefix.slice(1);
+      const loggedUser = await loginWithGoogle(`demo_google_token:${targetEmail}:${formattedName}`);
+      success(`Welcome ${loggedUser?.full_name || targetEmail}! Authenticated via Google.`);
       navigate('/dashboard');
     } catch (err) {
       setError(err.message || 'Google authentication failed.');

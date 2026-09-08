@@ -46,12 +46,25 @@ export const GoogleAuthModal = ({ isOpen, onClose, onSuccess }) => {
   };
 
   const handleDemoGoogleLogin = async (customEmail = null) => {
+    let targetEmail = customEmail || email;
+    if (!targetEmail) {
+      const userPrompt = window.prompt("Enter your Gmail address to Sign In with Google:", "haripriyacsd@gmail.com");
+      if (!userPrompt) return;
+      targetEmail = userPrompt.trim();
+    }
+
+    if (!targetEmail || !targetEmail.includes('@')) {
+      error('Please enter a valid Gmail address.');
+      return;
+    }
+
     setIsLoading(true);
     try {
-      const targetEmail = customEmail || email || 'google.analyst@gmail.com';
-      const loggedUser = await loginWithGoogle(`demo_google_token:${targetEmail}:Google Analyst`);
+      const emailPrefix = targetEmail.split('@')[0].replace(/[._-]/g, ' ');
+      const formattedName = fullName || (emailPrefix.charAt(0).toUpperCase() + emailPrefix.slice(1));
+      const loggedUser = await loginWithGoogle(`demo_google_token:${targetEmail}:${formattedName}`);
       
-      success(`Welcome ${loggedUser?.full_name || 'Google Analyst'}! Authenticated via Google.`);
+      success(`Welcome ${loggedUser?.full_name || targetEmail}! Authenticated via Google.`);
       if (onSuccess) onSuccess();
       if (onClose) onClose();
       navigate('/dashboard');
