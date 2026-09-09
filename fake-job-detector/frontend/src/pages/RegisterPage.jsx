@@ -46,25 +46,7 @@ export const RegisterPage = () => {
     }
   };
 
-  const handleDemoGoogleLogin = async (customEmail = null) => {
-    const safeEmail = (typeof customEmail === 'string' && customEmail.includes('@'))
-      ? customEmail.trim()
-      : (typeof email === 'string' && email.includes('@') ? email.trim() : 'haripriyacsd@gmail.com');
 
-    try {
-      setLoading(true);
-      setError('');
-      const emailPrefix = safeEmail.split('@')[0].replace(/[._-]/g, ' ');
-      const targetName = fullName || (emailPrefix.charAt(0).toUpperCase() + emailPrefix.slice(1));
-      const loggedUser = await loginWithGoogle(`demo_google_token:${safeEmail}:${targetName}`);
-      success(`Welcome ${loggedUser?.full_name || targetName}! Account authenticated via Google (${safeEmail}).`);
-      setShowSurvey(true);
-    } catch (err) {
-      setError(err.message || 'Google registration failed.');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();

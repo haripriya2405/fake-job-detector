@@ -43,25 +43,7 @@ export const LoginPage = () => {
     }
   };
 
-  const handleDemoGoogleLogin = async (customEmail = null) => {
-    const safeEmail = (typeof customEmail === 'string' && customEmail.includes('@'))
-      ? customEmail.trim()
-      : (typeof email === 'string' && email.includes('@') ? email.trim() : 'haripriyacsd@gmail.com');
 
-    try {
-      setLoading(true);
-      setError('');
-      const emailPrefix = safeEmail.split('@')[0].replace(/[._-]/g, ' ');
-      const formattedName = emailPrefix.charAt(0).toUpperCase() + emailPrefix.slice(1);
-      const loggedUser = await loginWithGoogle(`demo_google_token:${safeEmail}:${formattedName}`);
-      success(`Welcome ${loggedUser?.full_name || safeEmail}! Authenticated via Google.`);
-      navigate('/dashboard');
-    } catch (err) {
-      setError(err.message || 'Google authentication failed.');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
