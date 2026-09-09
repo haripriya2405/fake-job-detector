@@ -48,15 +48,17 @@ export const RegisterPage = () => {
   };
 
   const handleDemoGoogleLogin = async (customEmail = null) => {
-    const targetEmail = customEmail || email || 'haripriyacsd@gmail.com';
+    const safeEmail = (typeof customEmail === 'string' && customEmail.includes('@'))
+      ? customEmail.trim()
+      : (typeof email === 'string' && email.includes('@') ? email.trim() : 'haripriyacsd@gmail.com');
 
     try {
       setLoading(true);
       setError('');
-      const emailPrefix = targetEmail.split('@')[0].replace(/[._-]/g, ' ');
+      const emailPrefix = safeEmail.split('@')[0].replace(/[._-]/g, ' ');
       const targetName = fullName || (emailPrefix.charAt(0).toUpperCase() + emailPrefix.slice(1));
-      const loggedUser = await loginWithGoogle(`demo_google_token:${targetEmail}:${targetName}`);
-      success(`Welcome ${loggedUser?.full_name || targetName}! Account authenticated via Google.`);
+      const loggedUser = await loginWithGoogle(`demo_google_token:${safeEmail}:${targetName}`);
+      success(`Welcome ${loggedUser?.full_name || targetName}! Account authenticated via Google (${safeEmail}).`);
       setShowSurvey(true);
     } catch (err) {
       setError(err.message || 'Google registration failed.');
@@ -136,14 +138,14 @@ export const RegisterPage = () => {
             </div>
           )}
 
-          {/* Real Google OAuth Button */}
+          {/* Real Google OAuth Button or Interactive Google Modal Trigger */}
           <div className="flex flex-col items-center justify-center w-full py-1">
             {isRealGoogleConfigured ? (
               <div className="w-full flex flex-col items-center space-y-2">
                 <div className="w-full flex justify-center">
                   <GoogleLogin
                     onSuccess={handleGoogleSuccess}
-                    onError={() => handleDemoGoogleLogin()}
+                    onError={() => setShowGoogleModal(true)}
                     theme="filled_black"
                     shape="pill"
                     text="signup_with"
@@ -152,17 +154,17 @@ export const RegisterPage = () => {
                 </div>
                 <button
                   type="button"
-                  onClick={handleDemoGoogleLogin}
+                  onClick={() => setShowGoogleModal(true)}
                   disabled={loading}
                   className="text-[11px] text-fog hover:text-emerald-400 underline transition-colors pt-1"
                 >
-                  Having trouble with Google Popup? Click here for instant Google Sign-Up
+                  Click here to select your Gmail account
                 </button>
               </div>
             ) : (
               <button
                 type="button"
-                onClick={handleDemoGoogleLogin}
+                onClick={() => setShowGoogleModal(true)}
                 disabled={loading}
                 className="w-full flex items-center justify-center gap-3 bg-white hover:bg-slate-100 text-slate-800 font-semibold py-2.5 px-4 rounded-full shadow-md transition-all text-xs sm:text-sm active:scale-[0.99] disabled:opacity-50"
               >
@@ -176,8 +178,6 @@ export const RegisterPage = () => {
               </button>
             )}
           </div>
-
-
 
           {/* Divider */}
           <div className="relative flex items-center justify-center py-1">
@@ -248,7 +248,7 @@ export const RegisterPage = () => {
         </div>
       </div>
 
-      {/* Onboarding Survey Modal matching job1.mp4 */}
+      {/* Onboarding Survey Modal */}
       <OnboardingSurveyModal
         isOpen={showSurvey}
         onClose={() => navigate('/dashboard')}
@@ -258,7 +258,9 @@ export const RegisterPage = () => {
       {/* Google OAuth Modal */}
       <GoogleAuthModal
         isOpen={showGoogleModal}
+        defaultEmail={email}
         onClose={() => setShowGoogleModal(false)}
+        onSuccess={() => setShowSurvey(true)}
       />
     </div>
   );
