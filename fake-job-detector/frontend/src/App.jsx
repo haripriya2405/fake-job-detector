@@ -3,8 +3,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
 import { LanguageProvider } from './context/LanguageContext';
-import AppLayout from './components/layout/AppLayout';
-import { LoadingSpinner } from './components/ui/LoadingSpinner';
+import ProtectedRoute from './components/auth/ProtectedRoute';
 
 // Route-level Lazy Loaded Pages
 const LandingPage = lazy(() => import('./pages/LandingPage'));
@@ -55,14 +54,14 @@ export function App() {
 
                 {/* Workspace Layout Routes with Sidebar */}
                 <Route element={<AppLayout showSidebar={true} />}>
-                  <Route path="/scan" element={<AnalyzeJobPage />} />
-                  <Route path="/analyze" element={<AnalyzeJobPage />} />
-                  <Route path="/dashboard" element={<DashboardPage />} />
-                  <Route path="/history" element={<AnalysisHistoryPage />} />
-                  <Route path="/report-scam" element={<ReportScamPage />} />
+                  <Route path="/scan" element={<ProtectedRoute><AnalyzeJobPage /></ProtectedRoute>} />
+                  <Route path="/analyze" element={<ProtectedRoute><AnalyzeJobPage /></ProtectedRoute>} />
+                  <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+                  <Route path="/history" element={<ProtectedRoute><AnalysisHistoryPage /></ProtectedRoute>} />
+                  <Route path="/report-scam" element={<ProtectedRoute><ReportScamPage /></ProtectedRoute>} />
                   <Route path="/analysis/:id" element={<AnalysisResultPage />} />
                   <Route path="/analysis/detail/:id" element={<AnalysisDetailPage />} />
-                  <Route path="/settings" element={<SettingsPage />} />
+                  <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
                 </Route>
 
                 {/* Catch-all route */}

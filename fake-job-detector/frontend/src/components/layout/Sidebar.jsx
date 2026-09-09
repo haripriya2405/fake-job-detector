@@ -27,7 +27,7 @@ export const Sidebar = () => {
     }
   };
 
-  const displayName = user?.full_name || user?.username || (user?.email ? user.email.split('@')[0] : 'denvermh64');
+  const displayName = user?.full_name || user?.name || (user?.email ? user.email.split('@')[0] : 'Analyst');
   const scansCount = 1; // Or dynamic scan count
 
   const links = [
