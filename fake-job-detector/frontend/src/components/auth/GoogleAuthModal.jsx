@@ -164,18 +164,6 @@ export const GoogleAuthModal = ({ isOpen, onClose, onSuccess, defaultEmail = '' 
                 </button>
               </div>
 
-              {/* Real Google OAuth Button option if configured */}
-              {isRealGoogleConfigured && (
-                <div className="pt-2 pb-1 flex justify-center">
-                  <GoogleLogin
-                    onSuccess={handleRealGoogleSuccess}
-                    onError={() => setStep('enter_email')}
-                    theme="filled_black"
-                    shape="pill"
-                  />
-                </div>
-              )}
-
               {/* Disclaimer text matching Image 3 */}
               <p className="text-[11px] text-gray-400 pt-6 leading-relaxed">
                 Before using this app, you can review jobscamscore.com's{' '}
