@@ -29,34 +29,8 @@ async def lifespan(app: FastAPI):
     try:
         Base.metadata.create_all(bind=engine)
         logger.info("Database schema synchronized successfully.")
-
-        # Seed default demo security analyst users if not exist
-        from app.db.session import SessionLocal
-        from app.models.user import User
-        from app.core.security import hash_password
-
-        with SessionLocal() as db_session:
-            demo_users = [
-                ("demo@sentinel.ai", "Demo Security Analyst", "password123", "analyst"),
-                ("security.analyst@sentinel.ai", "Alex Vance", "password123", "analyst"),
-                ("analyst@company.com", "Google Workspace Analyst", "google-oauth-token", "analyst"),
-            ]
-            for email, name, pwd, role in demo_users:
-                existing = db_session.query(User).filter(User.email == email).first()
-                if not existing:
-                    user_obj = User(
-                        id=uuid.uuid4(),
-                        email=email,
-                        full_name=name,
-                        hashed_password=hash_password(pwd),
-                        role=role,
-                        is_active=True,
-                    )
-                    db_session.add(user_obj)
-            db_session.commit()
-            logger.info("Default security analyst demo accounts initialized.")
     except Exception as e:
-        logger.warning(f"Database schema auto-creation/seeding notice: {e}")
+        logger.warning(f"Database schema auto-creation notice: {e}")
 
     yield
 
