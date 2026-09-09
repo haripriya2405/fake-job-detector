@@ -21,8 +21,7 @@ export const LoginPage = () => {
   const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID?.trim();
   const isRealGoogleConfigured = !!googleClientId && 
     googleClientId !== '1083472093847-demo.apps.googleusercontent.com' &&
-    googleClientId !== '889410971849-mmih2g5pr197ogaols041j49mhem4da2.apps.googleusercontent.com' &&
-    !googleClientId.includes('demo');
+    !googleClientId.includes('demo_placeholder');
 
   const handleGoogleSuccess = async (credentialResponse) => {
     const idToken = credentialResponse?.credential;
