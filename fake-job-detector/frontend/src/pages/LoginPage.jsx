@@ -98,19 +98,21 @@ export const LoginPage = () => {
       {/* Center Main Card Container */}
       <div className="max-w-[400px] w-full mx-auto space-y-6 my-auto relative z-10">
         
-        {/* Brand Header */}
+        {/* Brand Header matching Image 1 */}
         <div className="text-center space-y-2">
-          <div className="inline-flex items-center justify-center w-11 h-11 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 shadow-emerald-glow mb-1">
-            <ShieldCheck className="w-6 h-6" />
-          </div>
-          <div>
-            <h1 className="text-base font-semibold text-frost tracking-tight">
-              SentinelJob AI
-            </h1>
-            <p className="text-[10px] font-mono font-medium uppercase tracking-[0.18em] text-fog">Job Scam Intelligence</p>
+          <div className="inline-flex items-center justify-center gap-2 mb-1">
+            <div className="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shadow-emerald-glow">
+              <ShieldCheck className="w-5 h-5" />
+            </div>
+            <div className="text-left">
+              <h1 className="text-sm font-semibold text-frost tracking-tight leading-none">
+                JobScamScore
+              </h1>
+              <p className="text-[9px] font-mono font-medium uppercase tracking-wider text-fog">Scam Intelligence</p>
+            </div>
           </div>
           
-          <h2 className="text-2xl sm:text-3xl font-medium text-frost tracking-tight pt-2">Sign in</h2>
+          <h2 className="text-2xl sm:text-3xl font-medium text-frost tracking-tight pt-1">Sign in</h2>
           <p className="text-xs text-mist font-light">Welcome back to your account</p>
 
           <div className="pt-1">
@@ -124,7 +126,7 @@ export const LoginPage = () => {
           </div>
         </div>
 
-        {/* Glass Authentication Card */}
+        {/* Glass Authentication Card matching Image 1 */}
         <div className="rounded-2xl border border-white/10 bg-[#07100c]/90 backdrop-blur-xl p-6 sm:p-7 shadow-2xl space-y-4">
           
           {error && (
@@ -182,7 +184,7 @@ export const LoginPage = () => {
             </span>
           </div>
 
-          {/* Form */}
+          {/* Form matching Image 1 */}
           <form onSubmit={handleSubmit} className="space-y-3.5">
             <div className="space-y-1.5">
               <label className="block text-xs font-medium text-mist">Email</label>
@@ -191,7 +193,7 @@ export const LoginPage = () => {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@company.com"
+                placeholder="you@example.com"
                 className="w-full px-4 py-2.5 rounded-xl bg-black/40 border border-white/10 text-frost placeholder-fog/60 text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all font-sans"
               />
             </div>
