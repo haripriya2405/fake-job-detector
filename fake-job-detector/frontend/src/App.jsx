@@ -5,6 +5,7 @@ import { ToastProvider } from './context/ToastContext';
 import { LanguageProvider } from './context/LanguageContext';
 import AppLayout from './components/layout/AppLayout';
 import ProtectedRoute from './components/auth/ProtectedRoute';
+import { LoadingSpinner } from './components/ui/LoadingSpinner';
 
 // Route-level Lazy Loaded Pages
 const LandingPage = lazy(() => import('./pages/LandingPage'));

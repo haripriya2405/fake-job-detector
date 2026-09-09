@@ -27,7 +27,7 @@ export const Sidebar = () => {
     }
   };
 
-  const displayName = user?.full_name || user?.name || (user?.email ? user.email.split('@')[0] : 'Analyst');
+  const displayName = typeof user?.full_name === 'string' ? user.full_name : typeof user?.name === 'string' ? user.name : (typeof user?.email === 'string' ? user.email.split('@')[0] : 'Analyst');
   const scansCount = 1; // Or dynamic scan count
 
   const links = [

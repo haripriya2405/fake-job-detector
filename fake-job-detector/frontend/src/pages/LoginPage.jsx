@@ -18,7 +18,7 @@ export const LoginPage = () => {
   const { success } = useToast();
   const navigate = useNavigate();
 
-  const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID?.trim();
+  const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID?.trim() || '889410971849-mmih2g5pr197ogaols041j49mhem4da2.apps.googleusercontent.com';
   const isRealGoogleConfigured = !!googleClientId && 
     googleClientId !== '1083472093847-demo.apps.googleusercontent.com' &&
     !googleClientId.includes('demo_placeholder');

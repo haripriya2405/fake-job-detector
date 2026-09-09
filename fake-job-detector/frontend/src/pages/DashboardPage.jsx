@@ -141,8 +141,7 @@ export const DashboardPage = () => {
     loadData();
   }, []);
 
-  const displayName =
-    user?.full_name || user?.username || (user?.email ? user.email.split('@')[0] : 'denvermh64');
+  const displayName = typeof user?.full_name === 'string' ? user.full_name : typeof user?.username === 'string' ? user.username : (typeof user?.email === 'string' ? user.email.split('@')[0] : 'Analyst');
 
   // Stats calculation
   const totalScans = analyses.length > 0 ? analyses.length : 1;

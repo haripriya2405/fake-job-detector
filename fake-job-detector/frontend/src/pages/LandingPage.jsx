@@ -49,7 +49,7 @@ export const LandingPage = () => {
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                   </span>
-                  <span className="font-semibold">Welcome back, {user?.full_name?.split(' ')[0] || user?.email?.split('@')[0] || 'Analyst'}</span>
+                  <span className="font-semibold">Welcome back, {typeof user?.full_name === 'string' ? user.full_name.split(' ')[0] : typeof user?.email === 'string' ? user.email.split('@')[0] : 'Analyst'}</span>
                   <span className="text-fog">|</span>
                   <span className="text-[11px] text-emerald-400/90 uppercase tracking-wider font-semibold">Pro Suite Active</span>
                 </div>

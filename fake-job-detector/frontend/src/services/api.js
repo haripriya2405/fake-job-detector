@@ -2,12 +2,19 @@ import axios from 'axios';
 
 const getApiBaseUrl = () => {
   const configured = import.meta.env.VITE_API_URL;
-  const is127 = typeof window !== 'undefined' && window.location.hostname === '127.0.0.1';
   if (configured) {
-    if (is127) return configured.replace('localhost', '127.0.0.1');
+    if (typeof window !== 'undefined' && window.location.hostname === '127.0.0.1') {
+      return configured.replace('localhost', '127.0.0.1');
+    }
     return configured;
   }
-  return is127 ? 'http://127.0.0.1:8000/api/v1' : 'http://localhost:8000/api/v1';
+  if (typeof window !== 'undefined') {
+    const host = window.location.hostname;
+    if (host === 'localhost' || host === '127.0.0.1') {
+      return 'http://127.0.0.1:8000/api/v1';
+    }
+  }
+  return 'https://sentineljob-backend.onrender.com/api/v1';
 };
 
 const API_BASE_URL = getApiBaseUrl();
