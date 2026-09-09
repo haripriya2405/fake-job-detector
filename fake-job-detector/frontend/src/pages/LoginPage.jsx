@@ -87,7 +87,7 @@ export const LoginPage = () => {
             </div>
             <div className="text-left">
               <h1 className="text-sm font-semibold text-frost tracking-tight leading-none">
-                JobScamScore
+                SentinelJob AI
               </h1>
               <p className="text-[9px] font-mono font-medium uppercase tracking-wider text-fog">Scam Intelligence</p>
             </div>
